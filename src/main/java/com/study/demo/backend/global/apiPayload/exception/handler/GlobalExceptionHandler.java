@@ -4,9 +4,11 @@ import com.study.demo.backend.global.apiPayload.CustomResponse;
 import com.study.demo.backend.global.apiPayload.code.BaseErrorCode;
 import com.study.demo.backend.global.apiPayload.code.GeneralErrorCode;
 import com.study.demo.backend.global.apiPayload.exception.CustomException;
+import com.study.demo.backend.global.service.DiscordWebhookService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -21,7 +23,10 @@ import java.util.Map;
 
 @Slf4j
 @RestControllerAdvice
+@RequiredArgsConstructor
 public class GlobalExceptionHandler {
+
+    public final DiscordWebhookService discordWebhookService;
 
     // 컨트롤러 메서드에서 @Valid 어노테이션을 사용하여 DTO의 유효성 검사를 수행
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -146,9 +151,13 @@ public class GlobalExceptionHandler {
 
     //애플리케이션에서 발생하는 커스텀 예외를 처리
     @ExceptionHandler(CustomException.class)
-    public ResponseEntity<CustomResponse<Void>> handleCustomException(CustomException ex) {
+    public ResponseEntity<CustomResponse<Void>> handleCustomException(CustomException ex, HttpServletRequest request) {
         //예외가 발생하면 로그 기록
         log.warn("[ CustomException ]: {}", ex.getCode().getMessage());
+
+        // 500 에러인 경우 웹훅 전송
+        discordWebhookService.sendErrorToDiscord(ex, request);
+
         //커스텀 예외에 정의된 에러 코드와 메시지를 포함한 응답 제공
         return ResponseEntity.status(ex.getCode().getHttpStatus())
                 .body(ex.getCode().getErrorResponse());
@@ -156,7 +165,7 @@ public class GlobalExceptionHandler {
 
     // 그 외의 정의되지 않은 모든 예외 처리
     @ExceptionHandler({Exception.class})
-    public ResponseEntity<CustomResponse<String>> handleAllException(Exception ex) {
+    public ResponseEntity<CustomResponse<String>> handleAllException(Exception ex, HttpServletRequest request) {
         log.error("[WARNING] Internal Server Error : {} ", ex.getMessage());
         BaseErrorCode errorCode = GeneralErrorCode.INTERNAL_SERVER_ERROR_500;
         CustomResponse<String> errorResponse = CustomResponse.onFailure(
@@ -164,6 +173,10 @@ public class GlobalExceptionHandler {
                 errorCode.getMessage(),
                 null
         );
+
+        // 500 에러인 경우 웹훅 전송
+        discordWebhookService.sendErrorToDiscord(ex, request);
+
         return ResponseEntity
                 .status(errorCode.getHttpStatus())
                 .body(errorResponse);
