@@ -173,6 +173,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             try {
                 throw e;
             } catch (SignatureException ex) {
+                log.warn("유효하지 않은 JWT 토큰입니다: {}", e.getMessage());
                 throw new RuntimeException(ex);
             }
         }
