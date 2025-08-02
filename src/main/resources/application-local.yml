@@ -12,6 +12,11 @@ spring:
     hibernate:
       ddl-auto: update
 
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
   jwt:
     secret: o2eh1qu7yo9gthdh78u2q1o7hyua2r7uyr2q9yi7smp
     token:
