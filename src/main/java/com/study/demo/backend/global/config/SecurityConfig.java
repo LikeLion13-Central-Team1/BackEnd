@@ -1,8 +1,19 @@
 package com.study.demo.backend.global.config;
 
+import com.study.demo.backend.domain.auth.service.command.JwtTokenCommandService;
+import com.study.demo.backend.domain.auth.service.query.JwtTokenQueryService;
+import com.study.demo.backend.domain.user.repository.UserRepository;
+import com.study.demo.backend.global.security.exception.JwtAccessDeniedHandler;
+import com.study.demo.backend.global.security.exception.JwtAuthenticationEntryPoint;
+import com.study.demo.backend.global.security.filter.CustomLoginFilter;
+import com.study.demo.backend.global.security.filter.JwtAuthorizationFilter;
+import com.study.demo.backend.global.security.handler.CustomLogoutHandler;
+import com.study.demo.backend.global.security.utils.JwtUtil;
+import com.study.demo.backend.global.utils.HttpResponseUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -11,6 +22,9 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import java.io.IOException;
 
 @Configuration
 @EnableWebSecurity
@@ -18,6 +32,12 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     private final AuthenticationConfiguration authenticationConfiguration;
+    private final JwtUtil jwtUtil;
+    private final UserRepository userRepository;
+    private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final JwtTokenCommandService jwtTokenCommandService;
+    private final JwtTokenQueryService jwtTokenQueryService;
 
     //인증이 필요하지 않은 url
     private final String[] allowedUrls = {
@@ -69,12 +89,49 @@ public class SecurityConfig {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
+        http
+                .exceptionHandling(exceptionHandling -> exceptionHandling
+                        .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+                        .accessDeniedHandler(jwtAccessDeniedHandler)
+                );
+
         // 경로별 인가
         http
                 .authorizeHttpRequests(auth -> auth
                         //위에서 정의했던 allowedUrls 들은 인증이 필요하지 않음 -> permitAll
                         .requestMatchers(allowedUrls).permitAll()
                         .anyRequest().authenticated() // 그 외의 url 들은 인증이 필요함
+                );
+
+        // CustomLoginFilter 인스턴스를 생성하고 필요한 의존성을 주입
+        CustomLoginFilter customLoginFilter = new CustomLoginFilter(
+                authenticationManager(authenticationConfiguration), jwtUtil, userRepository);
+        // Login Filter URL 지정
+        customLoginFilter.setFilterProcessesUrl("/api/v1/auth/login");
+        // 필터 체인에 CustomLoginFilter를 UsernamePasswordAuthenticationFilter 자리에서 동작하도록 추가
+        http
+                .addFilterAt(customLoginFilter, UsernamePasswordAuthenticationFilter.class);
+        // JwtFilter를 CustomLoginFilter 뒤에서 동작하도록 필터 체인에 추가
+        http
+                .addFilterAfter(new JwtAuthorizationFilter(jwtUtil, userRepository), CustomLoginFilter.class);
+
+        // Logout Handler 추가
+        http
+                .logout(logout -> logout
+                        .logoutUrl("/api/auth/logout")
+                        .addLogoutHandler(new CustomLogoutHandler(jwtTokenCommandService, jwtTokenQueryService, jwtUtil))
+                        .logoutSuccessHandler((request, response, authentication) -> {
+                            try {
+                                HttpResponseUtil.setSuccessResponse(
+                                        response,
+                                        HttpStatus.OK,
+                                        "로그아웃이 완료되었습니다."
+                                );
+                            } catch (IOException e) {
+                                // 예외 처리
+                                response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+                            }
+                        })
                 );
 
         return http.build();
