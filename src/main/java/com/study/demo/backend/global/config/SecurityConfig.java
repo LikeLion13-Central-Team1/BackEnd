@@ -46,7 +46,7 @@ public class SecurityConfig {
             "/v3/api-docs/**",
             "/api/v1/auth/login",
             "/api/v1/auth/login/customer",
-            "/api/v1/auth/owner"
+            "/api/v1/auth/login/owner"
     };
 
     @Bean
@@ -118,7 +118,7 @@ public class SecurityConfig {
         // Logout Handler 추가
         http
                 .logout(logout -> logout
-                        .logoutUrl("/api/auth/logout")
+                        .logoutUrl("/api/v1/auth/logout")
                         .addLogoutHandler(new CustomLogoutHandler(jwtTokenCommandService, jwtTokenQueryService, jwtUtil))
                         .logoutSuccessHandler((request, response, authentication) -> {
                             try {

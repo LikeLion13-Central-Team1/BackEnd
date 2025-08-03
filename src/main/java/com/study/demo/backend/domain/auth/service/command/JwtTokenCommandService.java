@@ -13,7 +13,6 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class JwtTokenCommandService implements TokenCommandService{
 
-    private final JwtUtil jwtUtil;
     private final RedisUtil redisUtil;
     private static final String BLACKLIST_PREFIX = "blacklist:";
 
