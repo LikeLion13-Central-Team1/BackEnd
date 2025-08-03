@@ -19,7 +19,6 @@ public class UserQueryServiceImpl implements UserQueryService {
     private final UserRepository userRepository;
 
     @Override
-    @Operation(summary = "사용자 정보 조회 API by 김지명", description = "현재 로그인된 사용자의 정보를 조회합니다.")
     public UserResDTO.UserInfo getUserInfo(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));

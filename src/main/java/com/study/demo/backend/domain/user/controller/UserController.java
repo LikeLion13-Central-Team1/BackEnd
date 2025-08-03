@@ -21,7 +21,7 @@ public class UserController {
     private final UserQueryService userQueryService;
 
     @GetMapping("")
-    @Operation()
+    @Operation(summary = "사용자 정보 조회 API by 김지명", description = "현재 로그인된 사용자의 정보를 조회합니다.")
     public CustomResponse<UserResDTO.UserInfo> getUserInfo(@CurrentUser AuthUser authUser) {
         UserResDTO.UserInfo response = userQueryService.getUserInfo(authUser.getEmail());
         return CustomResponse.onSuccess(response);
