@@ -156,7 +156,7 @@ public class GlobalExceptionHandler {
         log.warn("[ CustomException ]: {}", ex.getCode().getMessage());
 
         // 500 에러인 경우 웹훅 전송
-        discordWebhookService.sendErrorToDiscord(ex, request);
+//        discordWebhookService.sendErrorToDiscord(ex, request);
 
         //커스텀 예외에 정의된 에러 코드와 메시지를 포함한 응답 제공
         return ResponseEntity.status(ex.getCode().getHttpStatus())
@@ -175,7 +175,7 @@ public class GlobalExceptionHandler {
         );
 
         // 500 에러인 경우 웹훅 전송
-        discordWebhookService.sendErrorToDiscord(ex, request);
+//        discordWebhookService.sendErrorToDiscord(ex, request);
 
         return ResponseEntity
                 .status(errorCode.getHttpStatus())
