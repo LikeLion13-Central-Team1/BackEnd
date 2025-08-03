@@ -24,14 +24,14 @@ public class LoginServiceImpl implements LoginService {
     @Override
     public JwtDTO loginAsCustomer(String email, HttpServletResponse response) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new AuthException(AuthErrorCode.MEMBER_NOT_FOUND));
+                .orElseThrow(() -> new AuthException(AuthErrorCode.EMAIL_NOT_FOUND));
         return generateToken(user, response);
     }
 
     @Override
     public JwtDTO loginAsOwner(String email, HttpServletResponse response) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new AuthException(AuthErrorCode.MEMBER_NOT_FOUND));
+                .orElseThrow(() -> new AuthException(AuthErrorCode.EMAIL_NOT_FOUND));
         return generateToken(user, response);
     }
 
