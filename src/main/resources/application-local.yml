@@ -22,3 +22,7 @@ spring:
     token:
       access-expiration-time: 3600000
       refresh-expiration-time: 2592000000
+
+discord:
+  webhook:
+    url: ""
