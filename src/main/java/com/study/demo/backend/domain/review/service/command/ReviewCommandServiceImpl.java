@@ -19,6 +19,7 @@ import com.study.demo.backend.global.security.userdetails.AuthUser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -30,6 +31,7 @@ public class ReviewCommandServiceImpl implements ReviewCommandService{
     private final ReviewRepository reviewRepository;
 
     @Override
+    @Transactional
     public ReviewResDTO.WriteReview writeReview(AuthUser authUser, ReviewReqDTO.WriteReview reqDTO) {
         User user = userRepository.findByEmail(authUser.getEmail())
                 .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
