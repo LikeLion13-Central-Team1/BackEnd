@@ -9,6 +9,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ReviewConverter {
@@ -18,7 +19,7 @@ public class ReviewConverter {
                 .user(user)
                 .order(order)
                 .content(reqDTO.content())
-                .reviewDate(LocalDate.now())
+                .reviewDate(LocalDateTime.now())
                 .build();
     }
 
@@ -26,6 +27,26 @@ public class ReviewConverter {
         return ReviewResDTO.WriteReview.builder()
                 .content(review.getContent())
                 .reviewDate(review.getReviewDate())
+                .build();
+    }
+
+    public static ReviewResDTO.ReviewDetail toReviewDetail(Review review) {
+        return ReviewResDTO.ReviewDetail.builder()
+                .reviewId(review.getId())
+                .reviewContent(review.getContent())
+                .reviewDate(review.getReviewDate())
+                .orders(ReviewResDTO.OrderInfo.builder()
+                        .orderId(review.getOrder().getId())
+                        .menus(
+                                review.getOrder().getOrderMenus().stream()
+                                        .map(om -> ReviewResDTO.MenuInfo.builder()
+                                                .name(om.getMenu().getName())
+                                                .quantity(om.getQuantity())
+                                                .build())
+                                        .toList()
+                        )
+                        .build()
+                )
                 .build();
     }
 }
