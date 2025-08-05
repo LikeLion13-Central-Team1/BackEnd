@@ -26,3 +26,16 @@ spring:
 discord:
   webhook:
     url: ${DISCORD_WEBHOOK_URL}
+
+webclient:
+  connection-timeout: 5000
+  read-timeout: 30000  # OpenAI는 응답이 오래 걸릴 수 있음
+  write-timeout: 30000
+
+openai:
+  api:
+    key: ${OPENAI_API_KEY}
+    url: https://api.openai.com/v1/chat/completions
+    model: gpt-4o-mini
+    timeout: 30s
+    temperature: 0.6
