@@ -37,6 +37,6 @@ public class Menu {
     @Column(name = "description", nullable = false)
     private String description;
 
-    @Column(name = "menu_image", nullable = false)
+    @Column(name = "menu_image")
     private String menuImage;
 }
