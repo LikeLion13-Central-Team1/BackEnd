@@ -2,6 +2,7 @@ package com.study.demo.backend.domain.review.controller;
 
 import com.study.demo.backend.domain.review.dto.request.ReviewReqDTO;
 import com.study.demo.backend.domain.review.dto.response.ReviewResDTO;
+import com.study.demo.backend.domain.review.entity.enums.TargetType;
 import com.study.demo.backend.domain.review.service.command.ReviewCommandService;
 import com.study.demo.backend.domain.review.service.query.ReviewQueryService;
 import com.study.demo.backend.global.apiPayload.CustomResponse;
@@ -30,13 +31,23 @@ public class ReviewController {
     }
 
     @GetMapping("")
+    @Operation(
+            summary = "리뷰 목록 조회 API by 김지명",
+            description = """
+        메뉴 또는 가게(store) 기준으로 리뷰 목록을 커서 기반 페이지네이션 방식으로 조회합니다.
+        - `targetType`에 따라 `MENU` 또는 `STORE` 값을 설정하고
+        - `targetId`에 해당하는 메뉴 ID 또는 스토어 ID를 지정하세요.
+        - `cursor`는 reviewDate의 에폭 밀리초 값입니다.
+        """
+    )
     public CustomResponse<ReviewResDTO.ReviewDetailList> getReviewsByMenu(
-            @RequestParam("menuId") Long menuId,
+            @RequestParam("targetType") TargetType targetType,
+            @RequestParam("targetId") Long targetId,
             @RequestParam(value = "cursor", required = false) Long cursor,
             @RequestParam(value = "offset", defaultValue = "10") int size) {
 
         ReviewResDTO.ReviewDetailList resDTO =
-                reviewQueryService.getReviewsByMenu(menuId, cursor, size);
+                reviewQueryService.getReviewsByTarget(targetType, targetId, cursor, size);
 
         return CustomResponse.onSuccess(resDTO);
     }

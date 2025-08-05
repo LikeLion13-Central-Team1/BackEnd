@@ -14,16 +14,35 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     boolean existsByOrder(Order order);
 
     @Query("""
-    SELECT r FROM Review r
-    JOIN r.order o
-    JOIN OrderMenu om ON om.order = o
-    WHERE om.menu.id = :menuId
-      AND r.reviewDate < :cursor
-    ORDER BY r.reviewDate DESC
-    """)
-    List<Review> findReviewsByMenuIdBefore(
+        SELECT DISTINCT r FROM Review r
+        JOIN FETCH r.user
+        JOIN FETCH r.order o
+        JOIN FETCH o.orderMenus om
+        JOIN FETCH om.menu m
+        WHERE m.id = :menuId
+        AND (:cursorDate IS NULL OR r.reviewDate < :cursorDate)
+        ORDER BY r.reviewDate DESC
+        """)
+    List<Review> findReviewsByMenuId(
             @Param("menuId") Long menuId,
-            @Param("cursor") LocalDateTime cursor,
+            @Param("cursorDate") LocalDateTime cursorDate,
+            Pageable pageable
+    );
+
+    @Query("""
+        SELECT DISTINCT r FROM Review r
+        JOIN FETCH r.user
+        JOIN FETCH r.order o
+        JOIN FETCH o.orderMenus om
+        JOIN FETCH om.menu m
+        JOIN FETCH m.store s
+        WHERE s.id = :storeId
+        AND (:cursorDate IS NULL OR r.reviewDate < :cursorDate)
+        ORDER BY r.reviewDate DESC
+        """)
+    List<Review> findReviewsByStoreId(
+            @Param("storeId") Long storeId,
+            @Param("cursorDate") LocalDateTime cursorDate,
             Pageable pageable
     );
 }
