@@ -11,8 +11,8 @@ public class StoreConverter {
     public static Store toEntity(StoreReqDTO.Create dto) {
         return Store.builder()
                 .name(dto.name())
-                .latitude(BigDecimal.valueOf(dto.latitude()))
-                .longitude(BigDecimal.valueOf(dto.longitude()))
+                .latitude(dto.latitude())
+                .longitude(dto.longitude())
                 .openingTime(dto.openingTime())
                 .closingTime(dto.closingTime())
                 .build();
