@@ -15,14 +15,12 @@ import com.study.demo.backend.global.apiPayload.CustomResponse;
 import com.study.demo.backend.global.apiPayload.exception.CustomException;
 import com.study.demo.backend.global.security.annotation.CurrentUser;
 import com.study.demo.backend.global.security.userdetails.AuthUser;
-import com.study.demo.backend.global.security.userdetails.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -55,11 +53,10 @@ public class StoreController {
     @GetMapping("")
     @Operation(summary = "가게 목록 조회 API by 최현우", description = """
         가게 목록을 커서 기반 페이지네이션으로 조회합니다.  
-        - 정렬 기준 : 'distance(거리순)', 'review`(리뷰 많은 순)', 'discount`(할인율 순)' 
-        - cursor : 마지막으로 조회한 storeId (기본 null)  
-        - size : 조회할 데이터 수 (기본 10개)  
-        - 'lat', 'lng' : 현재 위치 좌표 (기본 상명대 위치)
-    """)
+        - 정렬 기준 : 'distance(거리순)', 'review`(리뷰 많은 순)', 'discount`(할인율 순)'
+        - cursor : 마지막으로 조회한 storeId (기본 null)
+        - size : 조회할 데이터 수 (기본 10개)
+        - 'lat', 'lng' : 현재 위치 좌표 (기본 상명대 위치) """)
     public CustomResponse<StoreResDTO.StoreDetailList> getStoreList(
             @Parameter(description = "마지막으로 조회한 storeId")
             @RequestParam(required = false) Long cursor,
