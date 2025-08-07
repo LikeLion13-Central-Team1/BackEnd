@@ -13,6 +13,8 @@ import com.study.demo.backend.domain.store.service.query.QueryService;
 import com.study.demo.backend.domain.user.entity.enums.Role;
 import com.study.demo.backend.global.apiPayload.CustomResponse;
 import com.study.demo.backend.global.apiPayload.exception.CustomException;
+import com.study.demo.backend.global.security.annotation.CurrentUser;
+import com.study.demo.backend.global.security.userdetails.AuthUser;
 import com.study.demo.backend.global.security.userdetails.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -39,9 +41,10 @@ public class StoreController {
     @Operation(summary = "가게 등록 API by 최현우", description = "사용자의 Role이 OWNER인 경우 가게를 등록합니다.")
     public CustomResponse<StoreResDTO.Create> createStore(
             @Valid @RequestBody StoreReqDTO.Create createDTO,
-            @AuthenticationPrincipal CustomUserDetails userDetails
-    ) {
-        if (!userDetails.getRole().equals(Role.OWNER)) {
+            @CurrentUser AuthUser authUser
+            ) {
+
+        if (!authUser.getRole().equals(Role.OWNER)) {
             throw new CustomException(StoreErrorCode.STORE_ACCESS_DENIED);
         }
         StoreResDTO.Create storeResDTO = commandService.createStore(createDTO);
@@ -92,9 +95,9 @@ public class StoreController {
     public CustomResponse<StoreResDTO.Update> updateStore(
             @PathVariable Long storeId,
             @Valid @RequestBody StoreReqDTO.Update updateDTO,
-            @AuthenticationPrincipal CustomUserDetails userDetails
+            @CurrentUser AuthUser authUser
     ) {
-        if (!userDetails.getRole().equals(Role.OWNER)) {
+        if (!authUser.getRole().equals(Role.OWNER)) {
             throw new CustomException(StoreErrorCode.STORE_ACCESS_DENIED);
         }
         StoreResDTO.Update response = commandService.updateStore(storeId, updateDTO);
