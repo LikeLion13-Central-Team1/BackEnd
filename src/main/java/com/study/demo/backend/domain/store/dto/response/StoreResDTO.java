@@ -2,7 +2,10 @@ package com.study.demo.backend.domain.store.dto.response;
 
 import lombok.Builder;
 
+
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 public class StoreResDTO {
@@ -11,10 +14,10 @@ public class StoreResDTO {
     public record Create(
             Long storeId,
             String name,
-            java.time.LocalTime openingTime,
-            java.time.LocalTime closingTime,
-            java.math.BigDecimal latitude,
-            java.math.BigDecimal longitude,
+            LocalTime openingTime,
+            LocalTime closingTime,
+            BigDecimal latitude,
+            BigDecimal longitude,
             LocalDateTime createdAt
     ){
     }
@@ -23,10 +26,10 @@ public class StoreResDTO {
     public record StoreDetail(
             Long storeId,
             String name,
-            java.time.LocalTime openingTime,
-            java.time.LocalTime closingTime,
-            java.math.BigDecimal latitude,
-            java.math.BigDecimal longitude,
+            LocalTime openingTime,
+            LocalTime closingTime,
+            BigDecimal latitude,
+            BigDecimal longitude,
             LocalDateTime createdAt
     ) {}
 
@@ -41,11 +44,11 @@ public class StoreResDTO {
     public record Update(
             Long storeId,
             String name,
-            java.time.LocalTime openingTime,
-            java.time.LocalTime closingTime,
-            java.math.BigDecimal latitude,
-            java.math.BigDecimal longitude,
-            java.time.LocalDateTime updatedAt
+            LocalTime openingTime,
+            LocalTime closingTime,
+            BigDecimal latitude,
+            BigDecimal longitude,
+            LocalDateTime updatedAt
     ) {}
 
 }
