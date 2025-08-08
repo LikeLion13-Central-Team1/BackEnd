@@ -11,6 +11,7 @@ import com.study.demo.backend.global.security.userdetails.AuthUser;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -50,5 +51,10 @@ public class ReviewController {
                 reviewQueryService.getReviewsByTarget(targetType, targetId, cursor, size);
 
         return CustomResponse.onSuccess(resDTO);
+    }
+
+    @GetMapping("/{storeId}/summary")
+    public CustomResponse<ReviewResDTO.Summary> getSummaryByStore(@PathVariable Long storeId) {
+        return CustomResponse.onSuccess(reviewQueryService.summarizeReviewsByStore(storeId));
     }
 }

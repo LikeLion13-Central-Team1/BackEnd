@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -71,10 +72,18 @@ public class WebClientConfig {
      * 공통 요청 로깅 필터
      */
     private ExchangeFilterFunction logRequest() {
-        return ExchangeFilterFunction.ofRequestProcessor(clientRequest -> {
-            log.debug("External API Request: {} {}", clientRequest.method(), clientRequest.url());
-            log.debug("Request Headers: {}", clientRequest.headers());
-            return Mono.just(clientRequest);
+        return ExchangeFilterFunction.ofRequestProcessor(req -> {
+            HttpHeaders masked = new HttpHeaders();
+            req.headers().forEach((k, v) -> {
+                if ("Authorization".equalsIgnoreCase(k)) {
+                    masked.add(k, "Bearer ****(masked)****");
+                } else {
+                    masked.addAll(k, v);
+                }
+            });
+            log.debug("External API Request: {} {}", req.method(), req.url());
+            log.debug("Request Headers: {}", masked);
+            return Mono.just(req);
         });
     }
 

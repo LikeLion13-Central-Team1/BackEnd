@@ -1,10 +1,12 @@
 package com.study.demo.backend.domain.review.service.query;
 
 import com.study.demo.backend.domain.review.converter.ReviewConverter;
+import com.study.demo.backend.domain.review.dto.request.ReviewReqDTO;
 import com.study.demo.backend.domain.review.dto.response.ReviewResDTO;
 import com.study.demo.backend.domain.review.entity.Review;
 import com.study.demo.backend.domain.review.entity.enums.TargetType;
 import com.study.demo.backend.domain.review.repository.ReviewRepository;
+import com.study.demo.backend.domain.review.service.command.GPTService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -22,7 +24,9 @@ import java.util.List;
 public class ReviewQueryServiceImpl implements ReviewQueryService {
 
     private final ReviewRepository reviewRepository;
+    private final GPTService gptService;
 
+    @Override
     public ReviewResDTO.ReviewDetailList getReviewsByTarget(
             TargetType targetType,
             Long targetId,
@@ -52,6 +56,14 @@ public class ReviewQueryServiceImpl implements ReviewQueryService {
                 .hasNext(hasNext)
                 .cursor(nextCursor)
                 .build();
+    }
+
+    @Override
+    public ReviewResDTO.Summary summarizeReviewsByStore(Long storeId) {
+        List<Review> reviews = reviewRepository.findAllByStoreIdOrderByReviewDateAtDesc(storeId);
+        List<String> contents = reviews.stream().map(Review::getContent).toList();
+        String summary = gptService.summarizeFromContents(contents);
+        return new ReviewResDTO.Summary(summary);
     }
 
     private List<Review> fetchReviewsByTargetType(

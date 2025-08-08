@@ -21,6 +21,7 @@ public class ReviewConverter {
         return Review.builder()
                 .user(user)
                 .order(order)
+                .store(order.getStore())
                 .content(reqDTO.content())
                 .reviewDate(LocalDateTime.now())
                 .build();

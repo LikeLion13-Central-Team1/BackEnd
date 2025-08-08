@@ -1,6 +1,7 @@
 package com.study.demo.backend.domain.review.entity;
 
 import com.study.demo.backend.domain.order.entity.Order;
+import com.study.demo.backend.domain.store.entity.Store;
 import com.study.demo.backend.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -22,6 +23,10 @@ public class Review {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "store_id", nullable = false)
+    private Store store;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id", nullable = false)

@@ -1,5 +1,6 @@
 package com.study.demo.backend.domain.order.entity;
 
+import com.study.demo.backend.domain.store.entity.Store;
 import com.study.demo.backend.domain.user.entity.User;
 import com.study.demo.backend.global.entity.BaseEntity;
 import jakarta.persistence.*;
@@ -25,6 +26,10 @@ public class Order extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "store_id", nullable = false)
+    private Store store;
 
     @Column(name = "order_time", nullable = false)
     private LocalDateTime orderTime;

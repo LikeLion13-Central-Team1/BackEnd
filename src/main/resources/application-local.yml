@@ -33,9 +33,7 @@ webclient:
   write-timeout: 30000
 
 openai:
+  model: gpt-4o-mini
   api:
+    url: https://api.openai.com/v1
     key: ${OPENAI_API_KEY}
-    url: https://api.openai.com/v1/chat/completions
-    model: gpt-4o-mini
-    timeout: 30s
-    temperature: 0.6
