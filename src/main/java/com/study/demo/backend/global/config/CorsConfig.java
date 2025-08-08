@@ -27,6 +27,8 @@ public class CorsConfig {
         allowedOriginPatterns.add("http://127.0.0.1:5000");
         allowedOriginPatterns.add("http://localhost:5500");
         allowedOriginPatterns.add("http://127.0.0.1:5500");
+        allowedOriginPatterns.add("http://localhost:63342");
+        allowedOriginPatterns.add("http://127.0.0.1:63342");
 
         configuration.setAllowedOriginPatterns(allowedOriginPatterns); // 허용할 Origin 설정
 
