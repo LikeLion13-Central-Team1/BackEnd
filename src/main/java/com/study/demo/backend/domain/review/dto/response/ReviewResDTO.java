@@ -45,4 +45,13 @@ public class ReviewResDTO {
     ) {
     }
 
+    public record GPTResponse(List<Choice> choices) {
+        public record Choice(Message message) {}
+        public record Message(String role, String content) {}
+    }
+
+    public record Summary(
+            String summary
+    ) {
+    }
 }

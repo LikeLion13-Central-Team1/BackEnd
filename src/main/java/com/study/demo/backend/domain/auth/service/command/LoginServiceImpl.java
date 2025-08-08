@@ -57,6 +57,7 @@ public class LoginServiceImpl implements LoginService {
         accessCookie.setHttpOnly(true);
         accessCookie.setPath("/");
         accessCookie.setMaxAge(Math.toIntExact(jwtUtil.getAccessExpMs() / 1000));
+        accessCookie.setAttribute("SameSite", "None");
         accessCookie.setSecure(true);
 
         // 리프레시 토큰 쿠키
@@ -64,6 +65,7 @@ public class LoginServiceImpl implements LoginService {
         refreshCookie.setHttpOnly(true);
         refreshCookie.setPath("/");
         refreshCookie.setMaxAge(Math.toIntExact(jwtUtil.getRefreshExpMs() / 1000));
+        refreshCookie.setAttribute("SameSite", "None");
         refreshCookie.setSecure(true);
 
         response.addCookie(accessCookie);

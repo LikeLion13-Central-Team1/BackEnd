@@ -45,4 +45,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             @Param("cursorDate") LocalDateTime cursorDate,
             Pageable pageable
     );
+
+    @Query("select r from Review r where r.store.id = :storeId order by r.reviewDate desc")
+    List<Review> findAllByStoreIdOrderByReviewDateAtDesc(@Param("storeId") Long storeId);
 }
