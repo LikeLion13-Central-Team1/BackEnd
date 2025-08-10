@@ -27,4 +27,11 @@ public class CartMenu {
 
     @Column(name = "quantity", nullable = false)
     private int quantity;
+
+    public void setQuantity(int q) {
+        if (q <= 0) {
+            throw new IllegalArgumentException("quantity must be positive");
+        }
+        this.quantity = q;
+    }
 }
