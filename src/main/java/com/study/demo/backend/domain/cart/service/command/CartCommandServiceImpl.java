@@ -35,7 +35,7 @@ public class CartCommandServiceImpl implements CartCommandService {
 
     @Override
     @Transactional
-    public CartResDTO.AddMenu addMenuToCart(CartReqDTO.AddMenu reqDTO, AuthUser authUser) {
+    public CartResDTO.CartInfo addMenuToCart(CartReqDTO.AddMenu reqDTO, AuthUser authUser) {
         User user = userRepository.findByEmail(authUser.getEmail())
                 .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
 
@@ -69,6 +69,6 @@ public class CartCommandServiceImpl implements CartCommandService {
         cartMenu.setQuantity(reqDTO.quantity());
 
         List<CartMenu> items = cartMenuRepository.findByCartId(cart.getId());
-        return CartConverter.toAddMenuResponse(cart, items);
+        return CartConverter.toCartInfo(cart, items);
     }
 }

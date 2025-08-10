@@ -26,4 +26,13 @@ public interface CartMenuRepository extends JpaRepository<CartMenu, Long> {
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("delete from CartMenu cm where cm.cart.id = :cartId")
     void deleteByCartId(@Param("cartId") Long cartId);
+
+    @Query("""
+       select cm
+       from CartMenu cm
+       join fetch cm.menu m
+       join fetch m.store s
+       where cm.cart.id = :cartId
+       """)
+    List<CartMenu> findByCartIdWithMenuAndStore(@Param("cartId") Long cartId);
 }

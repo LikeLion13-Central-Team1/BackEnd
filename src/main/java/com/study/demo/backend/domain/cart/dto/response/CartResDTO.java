@@ -7,7 +7,7 @@ import java.util.List;
 public class CartResDTO {
 
     @Builder
-    public record AddMenu(
+    public record CartInfo(
             Long cartId,
             List<CartMenuInfo> cartMenuInfoList
     ) {

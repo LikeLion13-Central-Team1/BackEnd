@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class CartConverter {
 
-    public static CartResDTO.AddMenu toAddMenuResponse(Cart cart, List<CartMenu> cartMenus) {
+    public static CartResDTO.CartInfo toCartInfo(Cart cart, List<CartMenu> cartMenus) {
         List<CartResDTO.CartMenuInfo> cartMenuInfoList = cartMenus.stream()
                 .map(cm -> new CartResDTO.CartMenuInfo(
                         cm.getMenu().getStore().getId(),
@@ -22,7 +22,7 @@ public class CartConverter {
                 ))
                 .collect(Collectors.toList());
 
-        return CartResDTO.AddMenu.builder()
+        return CartResDTO.CartInfo.builder()
                 .cartId(cart.getId())
                 .cartMenuInfoList(cartMenuInfoList)
                 .build();

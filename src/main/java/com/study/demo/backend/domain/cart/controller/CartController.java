@@ -11,10 +11,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
@@ -28,9 +25,16 @@ public class CartController {
 
     @PostMapping("")
     @Operation(summary = "장바구니 생성/메뉴추가 API by 김지명", description = "장바구니를 생성하여 메뉴를 추가합니다.")
-    public CustomResponse<CartResDTO.AddMenu> addMenuToCart(@RequestBody CartReqDTO.AddMenu reqDTO,
-                                                            @CurrentUser AuthUser authUser) {
-        CartResDTO.AddMenu resDTO = cartCommandService.addMenuToCart(reqDTO, authUser);
+    public CustomResponse<CartResDTO.CartInfo> addMenuToCart(@RequestBody CartReqDTO.AddMenu reqDTO,
+                                                             @CurrentUser AuthUser authUser) {
+        CartResDTO.CartInfo resDTO = cartCommandService.addMenuToCart(reqDTO, authUser);
+        return CustomResponse.onSuccess(resDTO);
+    }
+
+    @GetMapping("")
+    @Operation(summary = "장바구니 조회 API by 김지명", description = "장바구니를 조회합니다.")
+    public CustomResponse<CartResDTO.CartInfo> getCartInfo(@CurrentUser AuthUser authUser) {
+        CartResDTO.CartInfo resDTO = cartQueryService.getCartInfo(authUser);
         return CustomResponse.onSuccess(resDTO);
     }
 }
