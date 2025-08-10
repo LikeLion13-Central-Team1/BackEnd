@@ -54,6 +54,7 @@ public class ReviewController {
     }
 
     @GetMapping("/{storeId}/summary")
+    @Operation(summary = "GPT 리뷰 요약 API by 김지명", description = "GPT가 리뷰를 요약해줍니다.")
     public CustomResponse<ReviewResDTO.Summary> getSummaryByStore(@PathVariable Long storeId) {
         return CustomResponse.onSuccess(reviewQueryService.summarizeReviewsByStore(storeId));
     }
