@@ -26,6 +26,7 @@ public class UserLocationCommandServiceImpl implements UserLocationCommandServic
     private final UserLocationRepository userLocationRepository;
 
     @Override
+    @Transactional
     public UserLocationResDTO.LocationInfo createLocation(UserLocationReqDTO.Create reqDTO, AuthUser authUser) {
         User user = findUser(authUser);
 
@@ -40,12 +41,9 @@ public class UserLocationCommandServiceImpl implements UserLocationCommandServic
     public void changeActiveLocation(Long locationId, AuthUser authUser) {
         User user = findUser(authUser);
 
-        UserLocation targetLocation = userLocationRepository.findById(locationId)
-                .orElseThrow(() -> new UserLocationException(UserLocationErrorCode.USER_LOCATION_NOT_FOUND));
+        UserLocation targetLocation = findTargetLocation(locationId);
 
-        if(!targetLocation.getUser().getId().equals(user.getId())) {
-            throw new UserLocationException(UserLocationErrorCode.LOCATION_ACCESS_DENIED);
-        }
+        checkUserLocationAccess(user, targetLocation);
 
         userLocationRepository.findActiveLocationByUserId(user.getId())
                 .ifPresent(activeLocation -> activeLocation.updateActive(false));
@@ -53,8 +51,32 @@ public class UserLocationCommandServiceImpl implements UserLocationCommandServic
         targetLocation.updateActive(true);
     }
 
+    @Override
+    @Transactional
+    public UserLocationResDTO.LocationInfo modifyLocationInfo(Long locationId, AuthUser authUser, UserLocationReqDTO.Modify reqDTO) {
+        User user = findUser(authUser);
+
+        UserLocation targetLocation = findTargetLocation(locationId);
+
+        checkUserLocationAccess(user, targetLocation);
+
+        targetLocation.updateLocationInfo(reqDTO.latitude(), reqDTO.longitude(), reqDTO.name());
+        return UserLocationConverter.toLocationInfo(targetLocation);
+    }
+
     private User findUser(AuthUser authUser) {
         return userRepository.findByEmail(authUser.getEmail())
                 .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
+    }
+
+    private UserLocation findTargetLocation(Long locationId) {
+        return userLocationRepository.findById(locationId)
+                .orElseThrow(() -> new UserLocationException(UserLocationErrorCode.USER_LOCATION_NOT_FOUND));
+    }
+
+    private void checkUserLocationAccess(User user, UserLocation targetLocation) {
+        if(!targetLocation.getUser().getId().equals(user.getId())) {
+            throw new UserLocationException(UserLocationErrorCode.LOCATION_ACCESS_DENIED);
+        }
     }
 }

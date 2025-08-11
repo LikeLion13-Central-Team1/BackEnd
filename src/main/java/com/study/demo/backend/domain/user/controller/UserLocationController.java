@@ -47,9 +47,18 @@ public class UserLocationController {
 
     @PatchMapping("/active/{id}")
     @Operation(summary = "사용자 활성화 위치 변경 API by 김지명", description = "로그인 한 사용자의 활성화 위치를 변경합니다.")
-    public CustomResponse<Void> changeActiveLocation(@PathVariable("id") Long locationId,
-                                                       @CurrentUser AuthUser authUser) {
-        userLocationCommandService.changeActiveLocation(locationId, authUser);
+    public CustomResponse<Void> changeActiveLocation(@PathVariable("id") Long id, @CurrentUser AuthUser authUser) {
+        userLocationCommandService.changeActiveLocation(id, authUser);
         return CustomResponse.onSuccess((Void) null, "활성화 위치 변경 완료");
     }
+
+    @PatchMapping("/{id}")
+    @Operation(summary = "사용자 위치 정보 변경 API by 김지명", description = "로그인 한 사용자의 위치 정보를 변경합니다.")
+    public CustomResponse<UserLocationResDTO.LocationInfo> modifyLocationInfo(@PathVariable("id") Long id,
+                                                                              @CurrentUser AuthUser authUser,
+                                                                              @RequestBody UserLocationReqDTO.Modify reqDTO) {
+        UserLocationResDTO.LocationInfo resDTO = userLocationCommandService.modifyLocationInfo(id, authUser, reqDTO);
+        return CustomResponse.onSuccess(resDTO, "위치 정보 변경 완료");
+    }
+
 }

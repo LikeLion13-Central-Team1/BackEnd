@@ -10,4 +10,11 @@ public class UserLocationReqDTO {
             String name
     ) {
     }
+
+    public record Modify(
+            BigDecimal latitude,
+            BigDecimal longitude,
+            String name
+    ) {
+    }
 }
