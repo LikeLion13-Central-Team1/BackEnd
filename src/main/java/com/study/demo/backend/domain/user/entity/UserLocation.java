@@ -34,4 +34,8 @@ public class UserLocation extends BaseEntity {
     @Column(name = "active", nullable = false)
     @Builder.Default
     private boolean active = false;
+
+    public void updateActive(boolean active) {
+        this.active = active;
+    }
 }

@@ -44,4 +44,12 @@ public class UserLocationController {
         UserLocationResDTO.LocationInfo resDTO = userLocationQueryService.getActiveLocation(authUser);
         return CustomResponse.onSuccess(resDTO, "활성화 된 위치 조회 성공");
     }
+
+    @PatchMapping("/active/{id}")
+    @Operation(summary = "사용자 활성화 위치 변경 API by 김지명", description = "로그인 한 사용자의 활성화 위치를 변경합니다.")
+    public CustomResponse<Void> changeActiveLocation(@PathVariable("id") Long locationId,
+                                                       @CurrentUser AuthUser authUser) {
+        userLocationCommandService.changeActiveLocation(locationId, authUser);
+        return CustomResponse.onSuccess((Void) null, "활성화 위치 변경 완료");
+    }
 }
