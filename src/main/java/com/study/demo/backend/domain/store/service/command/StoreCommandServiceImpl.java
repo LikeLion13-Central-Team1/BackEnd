@@ -17,7 +17,7 @@ import java.math.BigDecimal;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class CommandServiceImpl implements CommandService {
+public class StoreCommandServiceImpl implements StoreCommandService {
 
     private final StoreRepository storeRepository;
 

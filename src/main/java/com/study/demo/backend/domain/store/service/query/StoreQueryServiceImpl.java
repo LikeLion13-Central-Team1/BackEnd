@@ -3,7 +3,7 @@ package com.study.demo.backend.domain.store.service.query;
 import com.study.demo.backend.domain.store.converter.StoreConverter;
 import com.study.demo.backend.domain.store.dto.response.StoreResDTO;
 import com.study.demo.backend.domain.store.entity.Store;
-import com.study.demo.backend.domain.store.entity.enums.StoreSortType;
+import com.study.demo.backend.domain.store.entity.storeEnums.StoreSortType;
 import com.study.demo.backend.domain.store.exception.StoreErrorCode;
 import com.study.demo.backend.domain.store.exception.StoreException;
 import com.study.demo.backend.domain.store.repository.StoreRepository;
@@ -14,7 +14,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Service
-public class QueryServiceImpl implements QueryService {
+public class StoreQueryServiceImpl implements StoreQueryService {
 
     private final StoreRepository storeRepository;
 
