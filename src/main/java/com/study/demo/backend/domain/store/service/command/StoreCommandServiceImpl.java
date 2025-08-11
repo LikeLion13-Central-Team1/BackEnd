@@ -7,6 +7,7 @@ import com.study.demo.backend.domain.store.entity.Store;
 import com.study.demo.backend.domain.store.exception.StoreErrorCode;
 import com.study.demo.backend.domain.store.exception.StoreException;
 import com.study.demo.backend.domain.store.repository.StoreRepository;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +18,7 @@ import java.math.BigDecimal;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class StoreCommandServiceImpl implements StoreCommandService {
 
     private final StoreRepository storeRepository;
