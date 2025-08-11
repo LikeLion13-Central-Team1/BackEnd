@@ -16,6 +16,7 @@ public class UserLocationConverter {
                 .latitude(reqDTO.latitude())
                 .longitude(reqDTO.longitude())
                 .name(reqDTO.name())
+                .active(false)
                 .build();
     }
 
@@ -25,6 +26,7 @@ public class UserLocationConverter {
                 .locationName(userLocation.getName())
                 .latitude(userLocation.getLatitude())
                 .longitude(userLocation.getLongitude())
+                .active(userLocation.isActive())
                 .build();
     }
 }

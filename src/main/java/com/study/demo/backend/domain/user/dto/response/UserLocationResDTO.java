@@ -12,7 +12,8 @@ public class UserLocationResDTO {
             Long locationId,
             String locationName,
             BigDecimal latitude,
-            BigDecimal longitude
+            BigDecimal longitude,
+            boolean active
     ) {
     }
 
