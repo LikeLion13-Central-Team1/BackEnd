@@ -61,4 +61,10 @@ public class UserLocationController {
         return CustomResponse.onSuccess(resDTO, "위치 정보 변경 완료");
     }
 
+    @DeleteMapping("/{id}")
+    @Operation(summary = "사용자 위치 삭제 API by 김지명", description = "로그인 한 사용자의 위치 정보를 변경합니다.")
+    public CustomResponse<Void> deleteLocation(@PathVariable("id") Long id, @CurrentUser AuthUser authUser) {
+        userLocationCommandService.deleteLocation(id, authUser);
+        return CustomResponse.onSuccess((Void) null, "위치 삭제 완료");
+    }
 }

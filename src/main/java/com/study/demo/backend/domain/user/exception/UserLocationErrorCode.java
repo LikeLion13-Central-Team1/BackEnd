@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 @AllArgsConstructor
 public enum UserLocationErrorCode implements BaseErrorCode {
 
+    CANNOT_DELETE_ACTIVE_LOCATION(HttpStatus.BAD_REQUEST, "USER400_0", "활성화 되어있는 위치는 삭제할 수 없습니다."),
     USER_LOCATION_NOT_FOUND(HttpStatus.NOT_FOUND, "USER_LOCATION_404_0", "해당 사용자위치를 찾을 수 없습니다."),
     LOCATION_ACCESS_DENIED(HttpStatus.FORBIDDEN,"USER_LOCATION_403_0", "해당 위치에 접근 권한이 없습니다."),
     ;

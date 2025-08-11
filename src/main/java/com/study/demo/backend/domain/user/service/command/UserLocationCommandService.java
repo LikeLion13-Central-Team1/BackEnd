@@ -8,4 +8,5 @@ public interface UserLocationCommandService {
     UserLocationResDTO.LocationInfo createLocation(UserLocationReqDTO.Create reqDTO, AuthUser authUser);
     void changeActiveLocation(Long locationId, AuthUser authUser);
     UserLocationResDTO.LocationInfo modifyLocationInfo(Long locationId,AuthUser authUser, UserLocationReqDTO.Modify reqDTO);
+    void deleteLocation(Long locationId, AuthUser authUser);
 }

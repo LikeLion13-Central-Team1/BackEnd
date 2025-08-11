@@ -64,6 +64,24 @@ public class UserLocationCommandServiceImpl implements UserLocationCommandServic
         return UserLocationConverter.toLocationInfo(targetLocation);
     }
 
+    @Override
+    @Transactional
+    public void deleteLocation(Long locationId, AuthUser authUser) {
+        User user = findUser(authUser);
+
+        UserLocation targetLocation = findTargetLocation(locationId);
+
+        checkUserLocationAccess(user, targetLocation);
+
+        if (targetLocation.isActive()) {
+            throw new UserLocationException(UserLocationErrorCode.CANNOT_DELETE_ACTIVE_LOCATION);
+        }
+
+        userLocationRepository.delete(targetLocation);
+    }
+
+    /* ------------내부 메서드------------ */
+
     private User findUser(AuthUser authUser) {
         return userRepository.findByEmail(authUser.getEmail())
                 .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
