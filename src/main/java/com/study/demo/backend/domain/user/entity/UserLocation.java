@@ -30,4 +30,18 @@ public class UserLocation extends BaseEntity {
 
     @Column(name = "name")
     private String name;
+
+    @Column(name = "active", nullable = false)
+    @Builder.Default
+    private boolean active = false;
+
+    public void updateActive(boolean active) {
+        this.active = active;
+    }
+
+    public void updateLocationInfo(BigDecimal latitude, BigDecimal longitude, String name) {
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.name = name;
+    }
 }
