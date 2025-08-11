@@ -6,6 +6,8 @@ import com.study.demo.backend.domain.user.entity.User;
 import com.study.demo.backend.domain.user.entity.UserLocation;
 import com.study.demo.backend.domain.user.exception.UserErrorCode;
 import com.study.demo.backend.domain.user.exception.UserException;
+import com.study.demo.backend.domain.user.exception.UserLocationErrorCode;
+import com.study.demo.backend.domain.user.exception.UserLocationException;
 import com.study.demo.backend.domain.user.repository.UserLocationRepository;
 import com.study.demo.backend.domain.user.repository.UserRepository;
 import com.study.demo.backend.global.security.userdetails.AuthUser;
@@ -25,8 +27,7 @@ public class UserLocationQueryServiceImpl implements UserLocationQueryService{
 
     @Override
     public UserLocationResDTO.LocationInfoList getLocationList(AuthUser authUser) {
-        User user = userRepository.findByEmail(authUser.getEmail())
-                .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
+        User user = findUser(authUser);
 
         List<UserLocation> userLocations = userLocationRepository.findAllLocationsByUserId(user.getId());
 
@@ -35,5 +36,20 @@ public class UserLocationQueryServiceImpl implements UserLocationQueryService{
                 .toList();
 
         return new UserLocationResDTO.LocationInfoList(locationInfoList);
+    }
+
+    @Override
+    public UserLocationResDTO.LocationInfo getActiveLocation(AuthUser authUser) {
+        User user = findUser(authUser);
+
+        UserLocation userLocation = userLocationRepository.findActiveLocationByUserId(user.getId())
+                .orElseThrow(() -> new UserLocationException(UserLocationErrorCode.USER_LOCATION_NOT_FOUND));
+
+        return UserLocationConverter.toLocationInfo(userLocation);
+    }
+
+    private User findUser(AuthUser authUser) {
+        return userRepository.findByEmail(authUser.getEmail())
+                .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
     }
 }

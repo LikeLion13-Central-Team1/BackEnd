@@ -6,4 +6,5 @@ import com.study.demo.backend.global.security.userdetails.AuthUser;
 public interface UserLocationQueryService {
 
     UserLocationResDTO.LocationInfoList getLocationList(AuthUser authUser);
+    UserLocationResDTO.LocationInfo getActiveLocation(AuthUser authUser);
 }

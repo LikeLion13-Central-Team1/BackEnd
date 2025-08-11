@@ -9,7 +9,7 @@ import org.springframework.http.HttpStatus;
 @AllArgsConstructor
 public enum UserLocationErrorCode implements BaseErrorCode {
 
-    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "USER_LOCATION_404_0", "해당 사용자위치를 찾을 수 없습니다."),
+    USER_LOCATION_NOT_FOUND(HttpStatus.NOT_FOUND, "USER_LOCATION_404_0", "해당 사용자위치를 찾을 수 없습니다."),
     ;
 
     private final HttpStatus httpStatus;

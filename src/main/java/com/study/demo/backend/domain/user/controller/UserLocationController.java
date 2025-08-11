@@ -37,4 +37,11 @@ public class UserLocationController {
         UserLocationResDTO.LocationInfoList resDTO = userLocationQueryService.getLocationList(authUser);
         return CustomResponse.onSuccess(resDTO, "위치 목록 조회 성공");
     }
+
+    @GetMapping("/active")
+    @Operation(summary = "활성화 된 사용자 위치 조회 API by 김지명", description = "로그인 한 사용자의 활성화 된 위치를 조회합니다.")
+    public CustomResponse<UserLocationResDTO.LocationInfo> getActiveLocation(@CurrentUser AuthUser authUser) {
+        UserLocationResDTO.LocationInfo resDTO = userLocationQueryService.getActiveLocation(authUser);
+        return CustomResponse.onSuccess(resDTO, "활성화 된 위치 조회 성공");
+    }
 }
