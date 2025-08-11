@@ -23,6 +23,11 @@ spring:
       access-expiration-time: 3600000
       refresh-expiration-time: 2592000000
 
+file:
+  upload:
+    root: ./uploads
+    public-prefix: /uploads
+
 discord:
   webhook:
     url: ""
