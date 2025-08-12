@@ -41,13 +41,19 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
     );
 
 
-    // 리뷰순 정렬
+    // 리뷰 개수 순 정렬
     @Query(value = """
-        SELECT * FROM store
-        WHERE (:cursor IS NULL OR id < :cursor)
-        ORDER BY review_count DESC, created_at DESC
-        LIMIT :size
-    """, nativeQuery = true)
+    SELECT  s.*
+    FROM    store s
+    LEFT JOIN (
+        SELECT  r.store_id, COUNT(*) AS cnt
+        FROM    review r
+        GROUP BY r.store_id
+    ) rc ON rc.store_id = s.id
+    WHERE   (:cursor IS NULL OR s.id < :cursor)
+    ORDER BY COALESCE(rc.cnt, 0) DESC, s.created_at DESC
+    LIMIT   :size
+""", nativeQuery = true)
     List<Store> findStoresByReview(
             @Param("cursor") Long cursor,
             @Param("size") int size
