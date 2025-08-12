@@ -4,12 +4,12 @@ import com.study.demo.backend.domain.store.converter.StoreConverter;
 import com.study.demo.backend.domain.store.dto.request.StoreReqDTO;
 import com.study.demo.backend.domain.store.dto.response.StoreResDTO;
 import com.study.demo.backend.domain.store.entity.Store;
-import com.study.demo.backend.domain.store.entity.enums.StoreSortType;
+import com.study.demo.backend.domain.store.entity.storeEnums.StoreSortType;
 import com.study.demo.backend.domain.store.exception.StoreErrorCode;
 import com.study.demo.backend.domain.store.exception.StoreException;
 import com.study.demo.backend.domain.store.repository.StoreRepository;
-import com.study.demo.backend.domain.store.service.command.CommandService;
-import com.study.demo.backend.domain.store.service.query.QueryService;
+import com.study.demo.backend.domain.store.service.command.StoreCommandService;
+import com.study.demo.backend.domain.store.service.query.StoreQueryService;
 import com.study.demo.backend.domain.user.entity.enums.Role;
 import com.study.demo.backend.global.apiPayload.CustomResponse;
 import com.study.demo.backend.global.apiPayload.exception.CustomException;
@@ -32,8 +32,8 @@ public class StoreController {
 
     private final StoreRepository storeRepository;
 
-    private final QueryService queryService;
-    private final CommandService commandService;
+    private final StoreQueryService storeQueryService;
+    private final StoreCommandService storeCommandService;
 
     @PostMapping("")
     @Operation(summary = "가게 등록 API by 최현우", description = "사용자의 Role이 OWNER인 경우 가게를 등록합니다.")
@@ -45,7 +45,7 @@ public class StoreController {
         if (!authUser.getRole().equals(Role.OWNER)) {
             throw new CustomException(StoreErrorCode.STORE_ACCESS_DENIED);
         }
-        StoreResDTO.Create storeResDTO = commandService.createStore(createDTO);
+        StoreResDTO.Create storeResDTO = storeCommandService.createStore(createDTO);
         return CustomResponse.onSuccess(storeResDTO);
     }
 
@@ -73,7 +73,7 @@ public class StoreController {
             @Parameter(description = "현재 경도", example = "126.9565")
             @RequestParam(required = false, defaultValue = "126.9565") double lng
     ) {
-        StoreResDTO.StoreDetailList storeDetailList = queryService.getStoreList(cursor, size, type, lat, lng);
+        StoreResDTO.StoreDetailList storeDetailList = storeQueryService.getStoreList(cursor, size, type, lat, lng);
         return CustomResponse.onSuccess(storeDetailList);
     }
 
@@ -97,7 +97,7 @@ public class StoreController {
         if (!authUser.getRole().equals(Role.OWNER)) {
             throw new CustomException(StoreErrorCode.STORE_ACCESS_DENIED);
         }
-        StoreResDTO.Update response = commandService.updateStore(storeId, updateDTO);
+        StoreResDTO.Update response = storeCommandService.updateStore(storeId, updateDTO);
         return CustomResponse.onSuccess(response);
     }
 }

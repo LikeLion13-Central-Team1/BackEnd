@@ -6,7 +6,7 @@ import jakarta.validation.Valid;
 import org.springframework.stereotype.Service;
 
 @Service
-public interface CommandService {
+public interface StoreCommandService {
     StoreResDTO.Create createStore(StoreReqDTO.@Valid Create createDTO);
 
     StoreResDTO.Update updateStore(Long storeId, StoreReqDTO.@Valid Update updateDTO);
