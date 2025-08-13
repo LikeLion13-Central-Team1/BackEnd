@@ -4,7 +4,6 @@ import com.study.demo.backend.global.apiPayload.CustomResponse;
 import com.study.demo.backend.global.apiPayload.code.BaseErrorCode;
 import com.study.demo.backend.global.apiPayload.code.GeneralErrorCode;
 import com.study.demo.backend.global.apiPayload.exception.CustomException;
-import com.study.demo.backend.global.service.DiscordWebhookService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
@@ -25,8 +24,6 @@ import java.util.Map;
 @RestControllerAdvice
 @RequiredArgsConstructor
 public class GlobalExceptionHandler {
-
-    public final DiscordWebhookService discordWebhookService;
 
     // 컨트롤러 메서드에서 @Valid 어노테이션을 사용하여 DTO의 유효성 검사를 수행
     @ExceptionHandler(MethodArgumentNotValidException.class)
