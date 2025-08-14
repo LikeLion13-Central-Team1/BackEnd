@@ -1,0 +1,95 @@
+package com.study.demo.backend.domain.order.service.command;
+
+import com.study.demo.backend.domain.menu.entity.Menu;
+import com.study.demo.backend.domain.menu.exception.MenuErrorCode;
+import com.study.demo.backend.domain.menu.repository.MenuRepository;
+import com.study.demo.backend.domain.order.converter.OrderConverter;
+import com.study.demo.backend.domain.order.dto.request.OrderReqDTO;
+import com.study.demo.backend.domain.order.dto.response.OrderResDTO;
+import com.study.demo.backend.domain.order.entity.Order;
+import com.study.demo.backend.domain.order.entity.OrderMenu;
+import com.study.demo.backend.domain.order.exception.OrderErrorCode;
+import com.study.demo.backend.domain.order.repository.OrderRepository;
+import com.study.demo.backend.domain.store.entity.Store;
+import com.study.demo.backend.domain.store.exception.StoreErrorCode;
+import com.study.demo.backend.domain.store.repository.StoreRepository;
+import com.study.demo.backend.domain.user.entity.User;
+import com.study.demo.backend.domain.user.exception.UserErrorCode;
+import com.study.demo.backend.domain.user.repository.UserRepository;
+import com.study.demo.backend.global.apiPayload.exception.CustomException;
+import com.study.demo.backend.global.security.userdetails.AuthUser;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+@Service
+@RequiredArgsConstructor
+@Transactional
+public class OrderCommandServiceImpl implements OrderCommandService {
+
+    private final OrderRepository orderRepository;
+    private final UserRepository userRepository;
+    private final StoreRepository storeRepository;
+    private final MenuRepository menuRepository;
+
+    @Override
+    public OrderResDTO.CreateOrder createOrder(Long storeId, OrderReqDTO.CreateOrder createOrder, AuthUser authUser) {
+        if (createOrder.visitTime().isBefore(LocalDateTime.now())) {
+            throw new CustomException(OrderErrorCode.VISIT_TIME_ERROR);
+        }
+
+        User user = userRepository.findById(authUser.getUserId())
+                .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
+
+        Store store = storeRepository.findById(storeId)
+                .orElseThrow(() -> new CustomException(StoreErrorCode.STORE_NOT_FOUND));
+
+        List<Long> menuIdList = createOrder.orderMenus().stream()
+                .map(OrderReqDTO.OrderItem::menuId)
+                .toList();
+
+        Map<Long, Menu> menuMap = menuRepository.findAllById(menuIdList).stream()
+                .collect(Collectors.toMap(Menu::getId, menu -> menu));
+
+        if (menuIdList.size() != menuMap.size()) {
+            throw new CustomException(OrderErrorCode.MENU_NOT_FOUND_IN_ORDER);
+        }
+
+        List<OrderMenu> orderMenus = createOrder.orderMenus().stream().map(orderItem -> {
+            Menu menu = menuMap.get(orderItem.menuId());
+
+            if (!menu.getStore().getId().equals(storeId)) {
+                throw new CustomException(MenuErrorCode.MENU_STORE_MISMATCH);
+            }
+            if (menu.getQuantity() < orderItem.quantity()) {
+                throw new CustomException(OrderErrorCode.INSUFFICIENT_STOCK);
+            }
+
+            menu.updateQuantity(menu.getQuantity() - orderItem.quantity()); // 재고의 수량 줄이기
+            return OrderConverter.toOrderMenu(menu, orderItem.quantity());
+        }).toList();
+
+        // 전체 가격 계산하기
+        BigDecimal totalPrice = orderMenus.stream()
+                .map(orderMenu -> {
+                    BigDecimal price = orderMenu.getMenu().getDiscountPrice();
+                    BigDecimal quantity = BigDecimal.valueOf(orderMenu.getQuantity());
+                    return price.multiply(quantity);
+                })
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        Order newOrder = OrderConverter.toOrder(user, store, createOrder, totalPrice);
+
+        orderMenus.forEach(orderMenu -> newOrder.addOrderMenu(orderMenu));
+
+        orderRepository.save(newOrder);
+
+        return OrderConverter.toCreateOrderResponse(newOrder);
+    }
+}

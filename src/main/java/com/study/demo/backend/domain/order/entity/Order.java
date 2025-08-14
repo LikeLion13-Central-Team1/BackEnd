@@ -45,4 +45,8 @@ public class Order extends BaseEntity {
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderMenu> orderMenus = new ArrayList<>();
+    public void addOrderMenu(OrderMenu orderMenu) {
+        this.orderMenus.add(orderMenu);
+        orderMenu.setOrder(this);
+    }
 }

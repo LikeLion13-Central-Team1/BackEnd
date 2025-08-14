@@ -27,4 +27,8 @@ public class OrderMenu extends BaseEntity {
 
     @Column(name = "quantity", nullable = false)
     private int quantity;
+
+    public void setOrder(Order order) {
+        this.order = order;
+    }
 }
