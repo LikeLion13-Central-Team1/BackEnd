@@ -29,33 +29,27 @@ public class LocalUploader implements FileUploader {
         if (file == null || file.isEmpty()) return null;
 
         try {
-            // 1) 저장 디렉토리 생성
             Path saveDir = Paths.get(uploadRoot, dir).toAbsolutePath().normalize();
             Files.createDirectories(saveDir);
 
-            // 2) 파일명/확장자 안전 처리
             String original = file.getOriginalFilename();
             String ext = "";
             if (original != null) {
                 int dot = original.lastIndexOf('.');
                 if (dot >= 0 && dot < original.length() - 1) {
-                    ext = original.substring(dot); // ".jpg"
+                    ext = original.substring(dot);
                 }
             }
             String savedName = UUID.randomUUID() + ext;
 
-            // 3) 안전한 저장: transferTo 대신 NIO copy (간헐적 이슈 방지)
             Path target = saveDir.resolve(savedName);
             try (InputStream in = file.getInputStream()) {
                 Files.copy(in, target, StandardCopyOption.REPLACE_EXISTING);
             }
 
-            // 4) 브라우저에서 접근할 공개 경로 반환
             return publicPrefix + "/" + dir + "/" + savedName;
 
         } catch (Exception e) {
-            // 원인 로그 남기기
-            // (SLF4J 사용)
             log.error("Local upload failed: root={}, dir={}, size={}, contentType={}, reason={}",
                     uploadRoot, dir, file.getSize(), file.getContentType(), e.getMessage(), e);
             throw new RuntimeException("로컬 이미지 업로드 실패", e);

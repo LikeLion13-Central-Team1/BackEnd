@@ -7,6 +7,7 @@ import com.study.demo.backend.domain.menu.dto.response.MenuResDTO;
 import com.study.demo.backend.domain.menu.entity.menuEnums.MenuSortType;
 import com.study.demo.backend.domain.menu.exception.MenuErrorCode;
 import com.study.demo.backend.domain.menu.repository.MenuRepository;
+import com.study.demo.backend.domain.menu.service.command.GPTImgService;
 import com.study.demo.backend.domain.menu.service.command.MenuCommandService;
 import com.study.demo.backend.domain.menu.service.query.MenuQueryService;
 import com.study.demo.backend.domain.user.entity.enums.Role;
@@ -18,8 +19,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -34,9 +33,9 @@ import org.springframework.web.multipart.MultipartFile;
 public class MenuController {
 
     private final MenuRepository menuRepository;
-
     private final MenuQueryService menuQueryService;
     private final MenuCommandService menuCommandService;
+    private final GPTImgService gptImgService;
 
     @PostMapping(value = "/store/{storeId}/menu", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "메뉴 등록 API by 최현우", description = "사용자의 Role이 OWNER인 경우 메뉴를 등록합니다.")
@@ -101,7 +100,7 @@ public class MenuController {
         return CustomResponse.onSuccess(menuDetailList);
     }
 
-    @GetMapping("store/{storeId}/menu/{menuId}")
+    @GetMapping("store/{storeId}/menus/{menuId}")
     @Operation(summary = "메뉴 상세 조회 API by 최현우", description = "특정 가게의 특정 메뉴 상세 정보를 조회합니다.")
     public CustomResponse<MenuResDTO.MenuDetail> getMenuDetail(
             @Parameter(description = "가게 ID", example = "1") @PathVariable Long storeId,
@@ -167,20 +166,36 @@ public class MenuController {
 
 
 
-    @DeleteMapping("/store/{storeId}/menu/{menuId}")
+    @DeleteMapping("/store/{storeId}/menus/{menuId}")
     @Operation(summary = "메뉴 삭제 API by 최현우", description = "role이 OWNER인 경우에 특정 가게의 특정 메뉴를 삭제합니다.")
     public CustomResponse<String> deleteMenu(
             @Parameter(description = "가게 ID", example = "1") @PathVariable Long storeId,
             @Parameter(description = "메뉴 ID", example = "8") @PathVariable Long menuId,
             @CurrentUser AuthUser authUser
     ) {
-
         if (!authUser.getRole().equals(Role.OWNER)) {
             throw new CustomException(MenuErrorCode.MENU_ACCESS_DENIED);
         }
 
+        menuCommandService.deleteMenu(storeId, menuId);
 
         return CustomResponse.onSuccess("메뉴 삭제 성공");
     }
-}
 
+    @PostMapping(value = "/menus/description", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "AI 메뉴 설명 생성 API", description = "메뉴 이름과 이미지를 받아 메뉴 설명을 AI로 생성합니다.")
+    public CustomResponse<String> generateMenuDescription(
+            @RequestPart("request") String AiRequestJson,
+            @RequestPart("menuImage") MultipartFile menuImage,
+            @CurrentUser AuthUser authUser
+    )  throws JsonProcessingException {
+        if (!authUser.getRole().equals(Role.OWNER)) {
+            throw new CustomException(MenuErrorCode.MENU_ACCESS_DENIED);
+        }
+
+        MenuReqDTO.GenerateDescription request = new ObjectMapper().readValue(AiRequestJson, MenuReqDTO.GenerateDescription.class);
+        String description = gptImgService.generateDescription(request, menuImage);
+
+        return CustomResponse.onSuccess(description);
+    }
+}

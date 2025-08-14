@@ -60,10 +60,17 @@ public class MenuReqDTO {
         ) {
         }
 
-        @Schema(name = "값 증감 요청")
+        @Schema(name = "값 증감 요청 DTO")
         public record ValueUpdate(
                 @NotNull
                 @Schema(description = "+1이면 증가, -1이면 감소", example = "1")
                 Integer changedValue
+        ) {}
+
+        @Schema(name = "AI 메뉴 설명 생성을 위한 요청 DTO")
+        public record GenerateDescription(
+                @NotBlank(message = "메뉴 이름은 필수 입력값입니다.")
+                @Schema(description = "메뉴 이름", example = "포테이토 피자")
+                String menuName
         ) {}
 }

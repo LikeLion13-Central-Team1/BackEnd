@@ -14,14 +14,16 @@ public enum MenuErrorCode implements BaseErrorCode {
     INVALID_PRICE(HttpStatus.BAD_REQUEST, "MENU400_2", "유효하지 않은 가격입니다."),
     INVALID_DISCOUNT_PERCENT(HttpStatus.BAD_REQUEST, "MENU400_3", "할인율은 0~100 사이 값 입니다."),
     INVALID_QUANTITY(HttpStatus.BAD_REQUEST, "MENU400_4","잘못된 수량 값 입니다." ),
-
+    MENU_IMAGE_REQUIRED(HttpStatus.BAD_REQUEST, "MENU400_5", "메뉴 이미지는 필수 첨부 파일입니다."),
 
     MENU_ACCESS_DENIED(HttpStatus.FORBIDDEN, "MENU403_0", "접근 권한(ROLE)이 없습니다."),
 
     MENU_NOT_FOUND(HttpStatus.NOT_FOUND, "MENU404_0", "요청한 메뉴가 존재하지 않습니다."),
     MENU_STORE_MISMATCH(HttpStatus.NOT_FOUND, "MENU404_1", "해당 가게에 존재하지 않는 메뉴입니다."),
 
-    MENU_ALREADY_EXISTS(HttpStatus.CONFLICT, "MENU409_0", "이미 존재하는 메뉴입니다.");
+    MENU_ALREADY_EXISTS(HttpStatus.CONFLICT, "MENU409_0", "이미 존재하는 메뉴입니다."),
+
+    AI_GENERATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "MENU500-001", "AI 메뉴 설명 생성 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
     private final HttpStatus httpStatus;
     private final String code;
     private final String message;
