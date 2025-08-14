@@ -62,7 +62,7 @@ public class MenuController {
     @Operation(summary = "가게별 메뉴 목록 조회 API by 최현우", description = """
             가게 목록을 커서 기반 페이지네이션으로 조회합니다.
             - 정렬 기준 : '가격 오름차순', '가격 내림차순', '할인율 순'
-            - cursor : 마지막으로 조회한 meuuId (기본 null)
+            - cursor : 마지막으로 조회한 menuId (기본 null)
             - size : 조회할 데이터 수 (기본 10개) """)
     public CustomResponse<MenuResDTO.MenuDetailList> getStoreMenuList(
             @Parameter(description = "가게 ID", example = "3")
