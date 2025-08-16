@@ -16,6 +16,7 @@ public class UserLocationConverter {
                 .latitude(reqDTO.latitude())
                 .longitude(reqDTO.longitude())
                 .name(reqDTO.name())
+                .roadAddressName(reqDTO.roadAddressName())
                 .active(false)
                 .build();
     }
@@ -24,6 +25,7 @@ public class UserLocationConverter {
         return UserLocationResDTO.LocationInfo.builder()
                 .locationId(userLocation.getId())
                 .locationName(userLocation.getName())
+                .roadAddressName(userLocation.getRoadAddressName())
                 .latitude(userLocation.getLatitude())
                 .longitude(userLocation.getLongitude())
                 .active(userLocation.isActive())
