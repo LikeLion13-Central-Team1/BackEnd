@@ -11,6 +11,7 @@ public class UserLocationResDTO {
     public record LocationInfo(
             Long locationId,
             String locationName,
+            String roadAddressName,
             BigDecimal latitude,
             BigDecimal longitude,
             boolean active

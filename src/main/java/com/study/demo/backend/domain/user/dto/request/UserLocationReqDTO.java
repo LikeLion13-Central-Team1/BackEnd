@@ -7,7 +7,8 @@ public class UserLocationReqDTO {
     public record Create(
             BigDecimal latitude,
             BigDecimal longitude,
-            String name
+            String name,
+            String roadAddressName
     ) {
     }
 

@@ -31,6 +31,9 @@ public class UserLocation extends BaseEntity {
     @Column(name = "name")
     private String name;
 
+    @Column(name = "road_address_name")
+    private String roadAddressName;
+
     @Column(name = "active", nullable = false)
     @Builder.Default
     private boolean active = false;
