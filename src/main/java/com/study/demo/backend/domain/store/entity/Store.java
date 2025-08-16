@@ -23,6 +23,9 @@ public class Store extends BaseEntity {
     @Column(name = "name", nullable = false)
     private String name;
 
+    @Column(name = "image_url")
+    private String imageUrl;
+
     @Column(name = "latitude", nullable = false, precision = 9, scale = 6)
     private BigDecimal latitude;
 
