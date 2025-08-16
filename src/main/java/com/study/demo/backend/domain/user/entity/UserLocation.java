@@ -42,9 +42,10 @@ public class UserLocation extends BaseEntity {
         this.active = active;
     }
 
-    public void updateLocationInfo(BigDecimal latitude, BigDecimal longitude, String name) {
+    public void updateLocationInfo(BigDecimal latitude, BigDecimal longitude, String name, String roadAddressName) {
         this.latitude = latitude;
         this.longitude = longitude;
         this.name = name;
+        this.roadAddressName = roadAddressName;
     }
 }

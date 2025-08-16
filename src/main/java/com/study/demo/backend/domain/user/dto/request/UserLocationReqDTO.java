@@ -15,7 +15,8 @@ public class UserLocationReqDTO {
     public record Modify(
             BigDecimal latitude,
             BigDecimal longitude,
-            String name
+            String name,
+            String roadAddressName
     ) {
     }
 }

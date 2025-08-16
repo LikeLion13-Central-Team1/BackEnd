@@ -60,7 +60,7 @@ public class UserLocationCommandServiceImpl implements UserLocationCommandServic
 
         checkUserLocationAccess(user, targetLocation);
 
-        targetLocation.updateLocationInfo(reqDTO.latitude(), reqDTO.longitude(), reqDTO.name());
+        targetLocation.updateLocationInfo(reqDTO.latitude(), reqDTO.longitude(), reqDTO.name(), reqDTO.roadAddressName());
         return UserLocationConverter.toLocationInfo(targetLocation);
     }
 
