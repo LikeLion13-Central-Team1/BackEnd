@@ -26,6 +26,7 @@ public class StoreResDTO {
     public record StoreDetail(
             Long storeId,
             String name,
+            String roadAddressName,
             String imageUrl,
             LocalTime openingTime,
             LocalTime closingTime,

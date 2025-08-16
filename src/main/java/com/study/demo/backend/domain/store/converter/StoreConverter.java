@@ -34,6 +34,7 @@ public class StoreConverter {
         return StoreResDTO.StoreDetail.builder()
                 .storeId(store.getId())
                 .name(store.getName())
+                .roadAddressName(store.getRoadAddressName())
                 .imageUrl(store.getImageUrl())
                 .openingTime(store.getOpeningTime())
                 .closingTime(store.getClosingTime())
