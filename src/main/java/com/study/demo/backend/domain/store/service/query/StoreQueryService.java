@@ -6,5 +6,6 @@ import org.springframework.stereotype.Service;
 
 @Service
 public interface StoreQueryService {
-    StoreResDTO.StoreDetailList getStoreList(Long cursor, int size, StoreSortType type, Double lat, Double lng);
+    StoreResDTO.StoreDetailList getStoreList(Long cursor, int size, StoreSortType type, double lat, double lng, Long userId);
+    StoreResDTO.StoreDetail getStoreDetail(Long storeId, Long userId);
 }
