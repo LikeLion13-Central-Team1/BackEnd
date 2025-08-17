@@ -37,4 +37,20 @@ public class CartController {
         CartResDTO.CartInfo resDTO = cartQueryService.getCartInfo(authUser);
         return CustomResponse.onSuccess(resDTO);
     }
+
+    @PatchMapping("/menu")
+    @Operation(summary = "장바구니 메뉴 수량 수정 API by 김지명", description = "장바구니에 있는 특정 메뉴의 수량을 수정합니다.")
+    public CustomResponse<CartResDTO.CartInfo> updateMenuQuantity(@RequestBody CartReqDTO.UpdateMenuQuantity reqDTO,
+                                                                  @CurrentUser AuthUser authUser) {
+        CartResDTO.CartInfo resDTO = cartCommandService.updateMenuQuantity(reqDTO, authUser);
+        return CustomResponse.onSuccess(resDTO);
+    }
+
+    @DeleteMapping("/menu")
+    @Operation(summary = "장바구니 메뉴 삭제 API by 김지명", description = "장바구니에서 특정 메뉴를 삭제합니다.")
+    public CustomResponse<CartResDTO.CartInfo> deleteMenuFromCart(@RequestBody CartReqDTO.DeleteMenu reqDTO,
+                                                                  @CurrentUser AuthUser authUser) {
+        CartResDTO.CartInfo resDTO = cartCommandService.deleteMenuFromCart(reqDTO, authUser);
+        return CustomResponse.onSuccess(resDTO);
+    }
 }
