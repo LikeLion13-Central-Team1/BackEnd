@@ -7,4 +7,15 @@ public class CartReqDTO {
             int quantity
     ) {
     }
+
+    public record UpdateMenuQuantity(
+            Long menuId,
+            int quantity
+    ) {
+    }
+
+    public record DeleteMenu(
+            Long menuId
+    ) {
+    }
 }
