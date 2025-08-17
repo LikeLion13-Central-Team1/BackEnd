@@ -9,6 +9,7 @@ import com.study.demo.backend.domain.review.repository.ReviewRepository;
 import com.study.demo.backend.domain.review.service.command.GPTService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -59,6 +60,7 @@ public class ReviewQueryServiceImpl implements ReviewQueryService {
     }
 
     @Override
+    @Cacheable(value = "summary", key = "#storeId")
     public ReviewResDTO.Summary summarizeReviewsByStore(Long storeId) {
         List<Review> reviews = reviewRepository.findAllByStoreIdOrderByReviewDateAtDesc(storeId);
         List<String> contents = reviews.stream().map(Review::getContent).toList();
