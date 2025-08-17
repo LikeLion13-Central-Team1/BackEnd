@@ -89,10 +89,6 @@ public class FavoriteController {
     }
 
 
-/*
-    // ========================= 가게 =========================
-    */
-
     @PostMapping("/favorites/stores/{storeId}")
     @Operation(summary = "가게 찜 추가", description = "해당 가게를 사용자의 찜에 추가합니다.")
     public CustomResponse<FavoriteResDTO.Status> addStoreFavorite(
