@@ -59,7 +59,7 @@ public class MenuController {
 
     @GetMapping("/store/{storeId}/menus")
     @Operation(summary = "가게별 메뉴 목록 조회 API by 최현우", description = """
-            가게 목록을 커서 기반 페이지네이션으로 조회합니다.
+            메뉴 목록을 커서 기반 페이지네이션으로 조회합니다.
             - 정렬 기준 : '가격 오름차순', '가격 내림차순', '할인율 순'
             - cursor : 마지막으로 조회한 menuId (기본 null)
             - size : 조회할 데이터 수 (기본 10개) """)
@@ -67,22 +67,24 @@ public class MenuController {
             @Parameter(description = "가게 ID", example = "3")
             @PathVariable Long storeId,
 
-            @Parameter(description = "마지막으로 조회한 storeId")
+            @Parameter(description = "마지막으로 조회한 menuId")
             @RequestParam(required = false) Long cursor,
 
             @Parameter(description = "한 번에 조회할 가게 수", example = "10")
             @RequestParam(defaultValue = "10") int size,
 
             @Parameter(description = "정렬 기준", example = "DISCOUNT")
-            @RequestParam(defaultValue = "DISCOUNT") MenuSortType menuSortType
+            @RequestParam(defaultValue = "DISCOUNT") MenuSortType menuSortType,
+
+            @CurrentUser AuthUser authUser
     ) {
-        MenuResDTO.MenuDetailList menuDetailList = menuQueryService.getStoreMenus(storeId, cursor, size, menuSortType);
+        MenuResDTO.MenuDetailList menuDetailList = menuQueryService.getStoreMenus(storeId, cursor, size, menuSortType, authUser.getUserId());
         return CustomResponse.onSuccess(menuDetailList);
     }
 
     @GetMapping("/menus")
     @Operation(summary = "메뉴 목록 조회 API by 최현우", description = """
-            가게 목록을 커서 기반 페이지네이션으로 조회합니다. 가게에 구애 받지 않고 메뉴들의 목록이 전부 뜨도록합니다.
+            메뉴 목록을 커서 기반 페이지네이션으로 조회합니다. 가게에 구애 받지 않고 메뉴들의 목록이 전부 뜨도록합니다.
             - 정렬 기준 : '가격 오름차순', '가격 내림차순', '할인율 순'
             - cursor : 마지막으로 조회한 meuuId (기본 null)
             - size : 조회할 데이터 수 (기본 10개) """)
@@ -90,13 +92,15 @@ public class MenuController {
             @Parameter(description = "마지막으로 조회한 storeId")
             @RequestParam(required = false) Long cursor,
 
-            @Parameter(description = "한 번에 조회할 가게 수", example = "10")
+            @Parameter(description = "한 번에 조회할 메뉴 수", example = "10")
             @RequestParam(defaultValue = "10") int size,
 
             @Parameter(description = "정렬 기준", example = "DISCOUNT")
-            @RequestParam(defaultValue = "DISCOUNT") MenuSortType menuSortType
+            @RequestParam(defaultValue = "DISCOUNT") MenuSortType menuSortType,
+
+            @CurrentUser AuthUser authUser
     ) {
-        MenuResDTO.MenuDetailList menuDetailList = menuQueryService.getMenus(cursor, size, menuSortType);
+        MenuResDTO.MenuDetailList menuDetailList = menuQueryService.getMenus(cursor, size, menuSortType, authUser.getUserId());
         return CustomResponse.onSuccess(menuDetailList);
     }
 
@@ -104,9 +108,10 @@ public class MenuController {
     @Operation(summary = "메뉴 상세 조회 API by 최현우", description = "특정 가게의 특정 메뉴 상세 정보를 조회합니다.")
     public CustomResponse<MenuResDTO.MenuDetail> getMenuDetail(
             @Parameter(description = "가게 ID", example = "1") @PathVariable Long storeId,
-            @Parameter(description = "메뉴 ID", example = "3") @PathVariable Long menuId
+            @Parameter(description = "메뉴 ID", example = "3") @PathVariable Long menuId,
+            @CurrentUser AuthUser authUser
     ) {
-        MenuResDTO.MenuDetail menuDetail = menuQueryService.getMenuDetail(storeId, menuId);
+        MenuResDTO.MenuDetail menuDetail = menuQueryService.getMenuDetail(storeId, menuId, authUser.getUserId());
         return CustomResponse.onSuccess(menuDetail);
     }
 

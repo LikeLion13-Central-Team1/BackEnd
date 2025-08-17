@@ -46,7 +46,8 @@ public class MenuResDTO {
             String description,
             String menuImage,
             Integer quantity,
-            LocalDateTime createdAt
+            LocalDateTime createdAt,
+            boolean favorited
     ) {}
 
     // 무한 스크롤, 커서 기반 페이지네이션 응답

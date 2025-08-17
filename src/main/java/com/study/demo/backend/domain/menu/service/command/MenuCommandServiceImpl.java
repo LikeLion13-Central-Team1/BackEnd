@@ -13,7 +13,6 @@ import com.study.demo.backend.domain.store.exception.StoreException;
 import com.study.demo.backend.domain.store.repository.StoreRepository;
 import com.study.demo.backend.global.ImgUploader.FileUploader;
 import com.study.demo.backend.global.apiPayload.exception.CustomException;
-import com.study.demo.backend.global.security.userdetails.AuthUser;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +20,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 
 @Slf4j
 @Service
