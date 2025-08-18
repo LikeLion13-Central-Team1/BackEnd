@@ -40,7 +40,7 @@ public class StoreController {
     public CustomResponse<StoreResDTO.Create> createStore(
             @Valid @RequestBody StoreReqDTO.Create createDTO,
             @CurrentUser AuthUser authUser
-            ) {
+    ) {
 
         if (!authUser.getRole().equals(Role.OWNER)) {
             throw new CustomException(StoreErrorCode.STORE_ACCESS_DENIED);
@@ -53,7 +53,7 @@ public class StoreController {
     @GetMapping("")
     @Operation(summary = "가게 목록 조회 API by 최현우", description = """
         가게 목록을 커서 기반 페이지네이션으로 조회합니다.  
-        - 정렬 기준 : 'distance(거리순)', 'review`(리뷰 많은 순)', 'discount`(할인율 순)'
+        - 정렬 기준 : 'distance(거리순)', 'review(리뷰 많은 순)'
         - cursor : 마지막으로 조회한 storeId (기본 null)
         - size : 조회할 데이터 수 (기본 10개)
         - 'lat', 'lng' : 현재 위치 좌표 (기본 상명대 위치) """)
@@ -71,19 +71,24 @@ public class StoreController {
             @RequestParam(required = false, defaultValue = "37.602") double lat,
 
             @Parameter(description = "현재 경도", example = "126.9565")
-            @RequestParam(required = false, defaultValue = "126.9565") double lng
+            @RequestParam(required = false, defaultValue = "126.9565") double lng,
+
+            @CurrentUser AuthUser authUser
     ) {
-        StoreResDTO.StoreDetailList storeDetailList = storeQueryService.getStoreList(cursor, size, type, lat, lng);
+        StoreResDTO.StoreDetailList storeDetailList = storeQueryService.getStoreList(cursor, size, type, lat, lng, authUser.getUserId());
         return CustomResponse.onSuccess(storeDetailList);
     }
 
     @GetMapping("/{storeId}")
     @Operation(summary = "가게 상세 조회 API by 최현우", description = "가게 상세 조회")
-    public CustomResponse<StoreResDTO.StoreDetail> getStoreDetail(@PathVariable Long storeId) {
+    public CustomResponse<StoreResDTO.StoreDetail> getStoreDetail(
+            @PathVariable Long storeId,
+            @CurrentUser AuthUser authUser
+    ) {
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new StoreException(StoreErrorCode.STORE_NOT_FOUND));
 
-        StoreResDTO.StoreDetail storeDetail = StoreConverter.toStoreDetailDTO(store);
+        StoreResDTO.StoreDetail storeDetail = storeQueryService.getStoreDetail(storeId, authUser.getUserId());
         return CustomResponse.onSuccess(storeDetail);
     }
 

@@ -30,7 +30,11 @@ public class StoreConverter {
         );
     }
 
-    public static StoreResDTO.StoreDetail toStoreDetailDTO(Store store) {
+    public static StoreResDTO.StoreDetail toStoreDetailDTO(Store s) {
+        return toStoreDetailDTO(s, false);
+    }
+
+    public static StoreResDTO.StoreDetail toStoreDetailDTO(Store store, boolean favorited) {
         return StoreResDTO.StoreDetail.builder()
                 .storeId(store.getId())
                 .name(store.getName())
@@ -41,6 +45,7 @@ public class StoreConverter {
                 .latitude(store.getLatitude())
                 .longitude(store.getLongitude())
                 .createdAt(store.getCreatedAt())
+                .favorited(favorited)
                 .build();
     }
 

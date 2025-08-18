@@ -1,5 +1,6 @@
 package com.study.demo.backend.domain.menu.service.query;
 
+import com.study.demo.backend.domain.favorite.repository.FavoriteMenuRepository;
 import com.study.demo.backend.domain.menu.converter.MenuConverter;
 import com.study.demo.backend.domain.menu.dto.response.MenuResDTO;
 import com.study.demo.backend.domain.menu.entity.Menu;
@@ -12,43 +13,51 @@ import com.study.demo.backend.domain.store.exception.StoreException;
 import com.study.demo.backend.domain.store.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @RequiredArgsConstructor
 @Service
+@Transactional(readOnly = true)
 public class MenuQueryServiceImpl implements MenuQueryService {
 
     private final MenuRepository menuRepository;
     private final StoreRepository storeRepository;
+    private final FavoriteMenuRepository favoriteMenuRepository;
 
     @Override
-    public MenuResDTO.MenuDetailList getStoreMenus(Long storeId, Long cursor, int size, MenuSortType type) {
+    public MenuResDTO.MenuDetailList getStoreMenus(Long storeId, Long cursor, int size, MenuSortType type,  Long userId) {
         if (type == null) {
             throw new MenuException(MenuErrorCode.INVALID_SORT_TYPE);
         }
 
+        final int limit = size + 1;
         List<Menu> sorted = switch (type) {
-            case PRICE_ASC  -> menuRepository.findMenusByPriceAsc(storeId, cursor, size + 1);
-            case PRICE_DESC -> menuRepository.findMenusByPriceDesc(storeId, cursor, size + 1);
-            case DISCOUNT   -> menuRepository.findMenusByDiscountDesc(storeId, cursor, size + 1);
+            case PRICE_ASC  -> menuRepository.findMenusByPriceAsc(storeId, cursor, limit);
+            case PRICE_DESC -> menuRepository.findMenusByPriceDesc(storeId, cursor, limit);
+            case DISCOUNT   -> menuRepository.findMenusByDiscountDesc(storeId, cursor, limit);
         };
 
         boolean hasNext = sorted.size() > size;
-
         List<Menu> page = hasNext ? sorted.subList(0, size) : sorted;
+        Set<Long> favoredIds = resolveFavoredIds(userId, page);
 
         Long nextCursor = page.isEmpty() ? null : page.get(page.size() - 1).getId();
-
         List<MenuResDTO.MenuDetail> content = page.stream()
-                .map(MenuConverter::toDetail).toList();
+                .map(m -> MenuConverter.toDetail(m, favoredIds.contains(m.getId())))
+                .toList();
 
         return new MenuResDTO.MenuDetailList(content, hasNext, nextCursor);
     }
 
     @Override
-    public MenuResDTO.MenuDetailList getMenus(Long cursor, int size, MenuSortType sortType) {
-        if (sortType == null) throw new MenuException(MenuErrorCode.INVALID_SORT_TYPE);
+    public MenuResDTO.MenuDetailList getMenus(Long cursor, int size, MenuSortType sortType, Long userId) {
+        if (sortType == null) {
+            throw new MenuException(MenuErrorCode.INVALID_SORT_TYPE);
+        }
 
         if (cursor != null && !menuRepository.existsById(cursor)) {
             cursor = null;
@@ -56,27 +65,27 @@ public class MenuQueryServiceImpl implements MenuQueryService {
 
         final int limit = size + 1;
         List<Menu> sorted = switch (sortType) {
-            case PRICE_ASC  -> menuRepository.findMenusByPriceAsc(null,cursor, limit);
-            case PRICE_DESC -> menuRepository.findMenusByPriceDesc(null,cursor, limit);
-            case DISCOUNT   -> menuRepository.findMenusByDiscountDesc(null,cursor, limit);
+            case PRICE_ASC  -> menuRepository.findMenusByPriceAsc(null, cursor, limit);
+            case PRICE_DESC -> menuRepository.findMenusByPriceDesc(null, cursor, limit);
+            case DISCOUNT   -> menuRepository.findMenusByDiscountDesc(null, cursor, limit);
         };
 
         boolean hasNext = sorted.size() > size;
         List<Menu> page = hasNext ? sorted.subList(0, size) : sorted;
 
-        Long nextCursor = page.isEmpty() ? null : page.get(page.size() - 1).getId();
+        Set<Long> favoredIds = resolveFavoredIds(userId, page);
 
-        var content = page.stream()
-                .map(MenuConverter::toDetail)
+        Long nextCursor = page.isEmpty() ? null : page.get(page.size() - 1).getId();
+        List<MenuResDTO.MenuDetail> content = page.stream()
+                .map(m -> MenuConverter.toDetail(m, favoredIds.contains(m.getId())))
                 .toList();
 
         return new MenuResDTO.MenuDetailList(content, hasNext, nextCursor);
     }
 
     @Override
-    public MenuResDTO.MenuDetail getMenuDetail(Long storeId, Long menuId) {
-        boolean storeExists = storeRepository.existsById(storeId);
-        if (!storeExists) {
+    public MenuResDTO.MenuDetail getMenuDetail(Long storeId, Long menuId, Long userId) {
+        if (!storeRepository.existsById(storeId)) {
             throw new StoreException(StoreErrorCode.STORE_NOT_FOUND);
         }
 
@@ -87,6 +96,19 @@ public class MenuQueryServiceImpl implements MenuQueryService {
             throw new MenuException(MenuErrorCode.MENU_STORE_MISMATCH);
         }
 
-        return MenuConverter.toDetail(menu);
+        boolean favorited = favoriteMenuRepository.existsByUserIdAndMenuId(userId, menuId);
+        return MenuConverter.toDetail(menu, favorited);
+    }
+
+    private Set<Long> resolveFavoredIds(Long userId, List<Menu> page) {
+        if (page.isEmpty()) return Set.of();
+
+        List<Long> menuIds = page.stream()
+                .map(Menu::getId)
+                .toList();
+
+        List<Long> favoriteIds = favoriteMenuRepository.findFavoriteMenuIds(userId, menuIds);
+
+        return new HashSet<>(favoriteIds);
     }
 }

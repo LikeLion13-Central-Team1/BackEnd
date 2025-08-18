@@ -6,9 +6,9 @@ import org.springframework.stereotype.Service;
 
 @Service
 public interface MenuQueryService {
-    MenuResDTO.MenuDetailList getStoreMenus(Long storeId, Long cursor, int size, MenuSortType menuSortType);
+    MenuResDTO.MenuDetailList getStoreMenus(Long storeId, Long cursor, int size, MenuSortType type, Long userId);
 
-    MenuResDTO.MenuDetailList getMenus(Long cursor, int size, MenuSortType menuSortType);
+    MenuResDTO.MenuDetailList getMenus(Long cursor, int size, MenuSortType sortType, Long userId);
 
-    MenuResDTO.MenuDetail getMenuDetail(Long storeId, Long menuId);
+    MenuResDTO.MenuDetail getMenuDetail(Long storeId, Long menuId, Long userId);
 }

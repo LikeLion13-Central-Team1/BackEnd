@@ -39,6 +39,10 @@ public class MenuConverter {
     }
 
     public static MenuResDTO.MenuDetail toDetail(Menu m) {
+        return toDetail(m, false);
+    }
+
+    public static MenuResDTO.MenuDetail toDetail(Menu m, boolean favorited) {
         return MenuResDTO.MenuDetail.builder()
                 .menuId(m.getId())
                 .name(m.getName())
@@ -47,6 +51,7 @@ public class MenuConverter {
                 .description(m.getDescription())
                 .menuImage(m.getMenuImage())
                 .quantity(m.getQuantity())
+                .favorited(favorited)
                 .build();
     }
 

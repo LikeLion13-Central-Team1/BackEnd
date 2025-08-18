@@ -32,7 +32,8 @@ public class StoreResDTO {
             LocalTime closingTime,
             BigDecimal latitude,
             BigDecimal longitude,
-            LocalDateTime createdAt
+            LocalDateTime createdAt,
+            boolean favorited
     ) {}
 
     // 무한 스크롤, 커서 기반 페이지네이션을 위해 필요한 데이터
@@ -52,5 +53,4 @@ public class StoreResDTO {
             BigDecimal longitude,
             LocalDateTime updatedAt
     ) {}
-
 }
