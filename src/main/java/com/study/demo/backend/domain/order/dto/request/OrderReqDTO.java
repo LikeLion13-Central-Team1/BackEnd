@@ -25,7 +25,6 @@ public class OrderReqDTO {
                 LocalDateTime visitTime
         ) {}
 
-        @Schema(name = "주문 생성 요청 DTO")
         public record CreateOrderByCartId(
                 @NotNull(message = "장바구니 ID는 필수입니다.")
                 @Schema(description = "장바구니 ID", example = "1")
