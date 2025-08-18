@@ -30,6 +30,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -103,8 +104,8 @@ public class OrderCommandServiceImpl implements OrderCommandService {
 
     @Override
     public OrderResDTO.CreateOrder createOrderFromCart(OrderReqDTO.CreateOrderByCartId request, AuthUser authUser) {
-        // 픽업 시간 검증
-        if (request.visitTime().isBefore(LocalDateTime.now())) {
+        // UTC 기준으로 통일
+        if (request.visitTime().isBefore(LocalDateTime.now(ZoneOffset.UTC))) {
             throw new CustomException(OrderErrorCode.VISIT_TIME_ERROR);
         }
 
