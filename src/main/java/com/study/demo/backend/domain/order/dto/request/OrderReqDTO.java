@@ -25,6 +25,18 @@ public class OrderReqDTO {
                 LocalDateTime visitTime
         ) {}
 
+        @Schema(name = "주문 생성 요청 DTO")
+        public record CreateOrderByCartId(
+                @NotNull(message = "장바구니 ID는 필수입니다.")
+                @Schema(description = "장바구니 ID", example = "1")
+                Long cartId,
+
+                @NotNull(message = "픽업 시간을 입력해주세요.")
+                @Future(message = "픽업 시간은 현재 시간 이후로 설정해야 합니다.")
+                @Schema(description = "픽업 방문 시간", example = "2025-08-15T08:15:00")
+                LocalDateTime visitTime
+        ) {}
+
         @Schema(name = "주문 메뉴 항목 DTO")
         public record OrderItem(
                 @NotNull(message = "메뉴 ID는 필수입니다.")

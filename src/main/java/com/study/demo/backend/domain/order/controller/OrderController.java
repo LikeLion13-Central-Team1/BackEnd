@@ -43,6 +43,20 @@ public class OrderController {
         return CustomResponse.onSuccess(response);
     }
 
+    @PostMapping("/orders")
+    @Operation(summary = "주문 생성 API by 김지명", description = "장바구니를 기반으로 주문을 생성합니다. 주문 완료 후 장바구니는 자동으로 비워집니다.")
+    public CustomResponse<OrderResDTO.CreateOrder> createOrder(
+            @Valid @RequestBody OrderReqDTO.CreateOrderByCartId request,
+            @CurrentUser AuthUser authUser
+    ) {
+        if (!authUser.getRole().equals(Role.CUSTOMER)) {
+            throw new CustomException(OrderErrorCode.ORDER_ACCESS_DENIED);
+        }
+
+        OrderResDTO.CreateOrder response = orderCommandService.createOrderFromCart(request, authUser);
+        return CustomResponse.onSuccess(response);
+    }
+
     @GetMapping("/orders")
     @Operation(summary = "주문 목록 조회 API by 최현우", description = """
             주문 내역을 커서 기반 페이지네이션으로 조회합니다. CUSTOMER와 OWNER 모두 이 기능을 사용할 수 있도록 하였습니다.

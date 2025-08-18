@@ -8,4 +8,5 @@ import org.springframework.stereotype.Service;
 @Service
 public interface OrderCommandService {
     OrderResDTO.CreateOrder createOrder(Long storeId, OrderReqDTO.CreateOrder request,AuthUser authUser);
+    OrderResDTO.CreateOrder createOrderFromCart(OrderReqDTO.CreateOrderByCartId request, AuthUser authUser);
 }

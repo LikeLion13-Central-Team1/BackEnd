@@ -1,5 +1,11 @@
 package com.study.demo.backend.domain.order.service.command;
 
+import com.study.demo.backend.domain.cart.entity.Cart;
+import com.study.demo.backend.domain.cart.entity.CartMenu;
+import com.study.demo.backend.domain.cart.exception.CartErrorCode;
+import com.study.demo.backend.domain.cart.exception.CartException;
+import com.study.demo.backend.domain.cart.repository.CartMenuRepository;
+import com.study.demo.backend.domain.cart.repository.CartRepository;
 import com.study.demo.backend.domain.menu.entity.Menu;
 import com.study.demo.backend.domain.menu.exception.MenuErrorCode;
 import com.study.demo.backend.domain.menu.repository.MenuRepository;
@@ -37,6 +43,8 @@ public class OrderCommandServiceImpl implements OrderCommandService {
     private final UserRepository userRepository;
     private final StoreRepository storeRepository;
     private final MenuRepository menuRepository;
+    private final CartRepository cartRepository;
+    private final CartMenuRepository cartMenuRepository;
 
     @Override
     public OrderResDTO.CreateOrder createOrder(Long storeId, OrderReqDTO.CreateOrder createOrder, AuthUser authUser) {
@@ -89,6 +97,83 @@ public class OrderCommandServiceImpl implements OrderCommandService {
         orderMenus.forEach(orderMenu -> newOrder.addOrderMenu(orderMenu));
 
         orderRepository.save(newOrder);
+
+        return OrderConverter.toCreateOrderResponse(newOrder);
+    }
+
+    @Override
+    public OrderResDTO.CreateOrder createOrderFromCart(OrderReqDTO.CreateOrderByCartId request, AuthUser authUser) {
+        // 픽업 시간 검증
+        if (request.visitTime().isBefore(LocalDateTime.now())) {
+            throw new CustomException(OrderErrorCode.VISIT_TIME_ERROR);
+        }
+
+        // 사용자 조회
+        User user = userRepository.findById(authUser.getUserId())
+                .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
+
+        // 장바구니 조회
+        Cart cart = cartRepository.findById(request.cartId())
+                .orElseThrow(() -> new CartException(CartErrorCode.CART_NOT_FOUND));
+
+        // 장바구니 소유자 확인
+        if (!cart.getUser().getId().equals(user.getId())) {
+            throw new CustomException(OrderErrorCode.CART_ACCESS_DENIED);
+        }
+
+        // 장바구니 메뉴 조회 (메뉴와 가게 정보도 함께 조회)
+        List<CartMenu> cartMenus = cartMenuRepository.findByCartIdWithMenuAndStore(cart.getId());
+
+        if (cartMenus.isEmpty()) {
+            throw new CartException(CartErrorCode.CART_EMPTY);
+        }
+
+        // 모든 메뉴가 같은 가게인지 확인 (장바구니 로직에서 이미 보장되지만 한번 더 체크)
+        Store store = cartMenus.get(0).getMenu().getStore();
+        boolean isSameStore = cartMenus.stream()
+                .allMatch(cm -> cm.getMenu().getStore().getId().equals(store.getId()));
+
+        if (!isSameStore) {
+            throw new CustomException(OrderErrorCode.DIFFERENT_STORE_MENUS);
+        }
+
+        // 재고 확인 및 차감, OrderMenu 생성
+        List<OrderMenu> orderMenus = cartMenus.stream().map(cartMenu -> {
+            Menu menu = cartMenu.getMenu();
+            int orderQuantity = cartMenu.getQuantity();
+
+            // 재고 확인
+            if (menu.getQuantity() < orderQuantity) {
+                throw new CustomException(OrderErrorCode.INSUFFICIENT_STOCK);
+            }
+
+            // 재고 차감
+            menu.updateQuantity(menu.getQuantity() - orderQuantity);
+
+            // OrderMenu 생성
+            return OrderConverter.toOrderMenu(menu, orderQuantity);
+        }).toList();
+
+        // 총 가격 계산
+        BigDecimal totalPrice = orderMenus.stream()
+                .map(orderMenu -> {
+                    BigDecimal price = orderMenu.getMenu().getDiscountPrice();
+                    BigDecimal quantity = BigDecimal.valueOf(orderMenu.getQuantity());
+                    return price.multiply(quantity);
+                })
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        // 주문 생성
+        Order newOrder = OrderConverter.toOrder(user, store, request, totalPrice);
+
+        // OrderMenu들을 주문에 추가
+        orderMenus.forEach(orderMenu -> newOrder.addOrderMenu(orderMenu));
+
+        // 주문 저장
+        orderRepository.save(newOrder);
+
+        // 장바구니 비우기 (주문 완료 후)
+        cartMenuRepository.deleteByCartId(cart.getId());
 
         return OrderConverter.toCreateOrderResponse(newOrder);
     }

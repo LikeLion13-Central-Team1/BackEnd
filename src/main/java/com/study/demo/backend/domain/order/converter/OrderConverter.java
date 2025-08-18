@@ -28,6 +28,19 @@ public class OrderConverter {
                 .build();
     }
 
+    // CartId로 픽업 예약 생성 전용
+    public static Order toOrder(User user, Store store, OrderReqDTO.CreateOrderByCartId request, BigDecimal totalPrice) {
+        return Order.builder()
+                .user(user)
+                .store(store)
+                .orderTime(LocalDateTime.now())
+                .visitTime(request.visitTime())
+                .totalPrice(totalPrice)
+                .orderNum(UUID.randomUUID().toString())
+                .orderMenus(new ArrayList<>())
+                .build();
+    }
+
     public static OrderMenu toOrderMenu(Menu menu, int quantity) {
         return OrderMenu.builder()
                 .menu(menu)
