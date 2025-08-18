@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -36,9 +37,21 @@ public class OrderConverter {
                 .orderTime(LocalDateTime.now())
                 .visitTime(request.visitTime())
                 .totalPrice(totalPrice)
-                .orderNum(UUID.randomUUID().toString())
+                .orderNum(generateRandomOrderNum())
                 .orderMenus(new ArrayList<>())
                 .build();
+    }
+
+    private static String generateRandomOrderNum() {
+        String chars = "abcdefghijklmnopqrstuvwxyz0123456789";
+        Random random = new Random();
+        StringBuilder result = new StringBuilder(5);
+
+        for (int i = 0; i < 5; i++) {
+            result.append(chars.charAt(random.nextInt(chars.length())));
+        }
+
+        return result.toString();
     }
 
     public static OrderMenu toOrderMenu(Menu menu, int quantity) {
