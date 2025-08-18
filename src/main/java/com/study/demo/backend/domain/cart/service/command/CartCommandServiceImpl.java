@@ -71,4 +71,45 @@ public class CartCommandServiceImpl implements CartCommandService {
         List<CartMenu> items = cartMenuRepository.findByCartId(cart.getId());
         return CartConverter.toCartInfo(cart, items);
     }
+
+    @Override
+    @Transactional
+    public CartResDTO.CartInfo updateMenuQuantity(CartReqDTO.UpdateMenuQuantity reqDTO, AuthUser authUser) {
+        User user = userRepository.findByEmail(authUser.getEmail())
+                .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
+
+        Cart cart = cartRepository.findByUserId(user.getId())
+                .orElseThrow(() -> new CartException(CartErrorCode.CART_NOT_FOUND));
+
+        CartMenu cartMenu = cartMenuRepository.findByCartIdAndMenuId(cart.getId(), reqDTO.menuId())
+                .orElseThrow(() -> new CartException(CartErrorCode.MENU_NOT_FOUND));
+
+        // 수량 검증 및 설정
+        if (reqDTO.quantity() <= 0) {
+            throw new CartException(CartErrorCode.INVALID_QUANTITY);
+        }
+
+        cartMenu.setQuantity(reqDTO.quantity());
+
+        List<CartMenu> items = cartMenuRepository.findByCartIdWithMenuAndStore(cart.getId());
+        return CartConverter.toCartInfo(cart, items);
+    }
+
+    @Override
+    @Transactional
+    public CartResDTO.CartInfo deleteMenuFromCart(CartReqDTO.DeleteMenu reqDTO, AuthUser authUser) {
+        User user = userRepository.findByEmail(authUser.getEmail())
+                .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
+
+        Cart cart = cartRepository.findByUserId(user.getId())
+                .orElseThrow(() -> new CartException(CartErrorCode.CART_NOT_FOUND));
+
+        CartMenu cartMenu = cartMenuRepository.findByCartIdAndMenuId(cart.getId(), reqDTO.menuId())
+                .orElseThrow(() -> new CartException(CartErrorCode.MENU_NOT_FOUND));
+
+        cartMenuRepository.delete(cartMenu);
+
+        List<CartMenu> items = cartMenuRepository.findByCartIdWithMenuAndStore(cart.getId());
+        return CartConverter.toCartInfo(cart, items);
+    }
 }
