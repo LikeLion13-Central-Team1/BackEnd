@@ -51,6 +51,8 @@ public class MenuConverter {
                 .description(m.getDescription())
                 .menuImage(m.getMenuImage())
                 .quantity(m.getQuantity())
+                .storeId(m.getStore().getId())
+                .storeName(m.getStore().getName())
                 .favorited(favorited)
                 .build();
     }

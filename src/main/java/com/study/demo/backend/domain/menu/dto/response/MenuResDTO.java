@@ -47,6 +47,8 @@ public class MenuResDTO {
             String menuImage,
             Integer quantity,
             LocalDateTime createdAt,
+            Long storeId,
+            String storeName,
             boolean favorited
     ) {}
 
