@@ -9,6 +9,7 @@ import com.study.demo.backend.global.apiPayload.CustomResponse;
 import com.study.demo.backend.global.security.annotation.CurrentUser;
 import com.study.demo.backend.global.security.userdetails.AuthUser;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/reviews")
+@Tag(name = "리뷰 API", description = "리뷰 관련 API")
 @RequiredArgsConstructor
 public class ReviewController {
 
@@ -50,6 +52,17 @@ public class ReviewController {
         ReviewResDTO.ReviewDetailList resDTO =
                 reviewQueryService.getReviewsByTarget(targetType, targetId, cursor, size);
 
+        return CustomResponse.onSuccess(resDTO);
+    }
+
+    @GetMapping("/users")
+    @Operation(summary = "유저별 리뷰 조회 API by 김지명", description = "JWT 토큰으로 유저별 리뷰를 조회합니다.")
+    public CustomResponse<ReviewResDTO.ReviewDetailList> getReviewsByUser(
+            @CurrentUser AuthUser authUser,
+            @RequestParam(value = "cursor", required = false) Long cursor,
+            @RequestParam(value = "offset", defaultValue = "10") int size) {
+
+        ReviewResDTO.ReviewDetailList resDTO = reviewQueryService.getReviewsByUser(authUser, cursor, size);
         return CustomResponse.onSuccess(resDTO);
     }
 
