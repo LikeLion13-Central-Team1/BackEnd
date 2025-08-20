@@ -12,6 +12,8 @@ import com.study.demo.backend.domain.store.exception.StoreErrorCode;
 import com.study.demo.backend.domain.store.exception.StoreException;
 import com.study.demo.backend.domain.store.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,11 +36,12 @@ public class MenuQueryServiceImpl implements MenuQueryService {
             throw new MenuException(MenuErrorCode.INVALID_SORT_TYPE);
         }
 
-        final int limit = size + 1;
+        final int fetchSize = size + 1;
+        Pageable pageable = PageRequest.of(0, fetchSize);
         List<Menu> sorted = switch (type) {
-            case PRICE_ASC  -> menuRepository.findMenusByPriceAsc(storeId, cursor, limit);
-            case PRICE_DESC -> menuRepository.findMenusByPriceDesc(storeId, cursor, limit);
-            case DISCOUNT   -> menuRepository.findMenusByDiscountDesc(storeId, cursor, limit);
+            case PRICE_ASC  -> menuRepository.findMenusByPriceAsc(storeId, cursor, pageable);
+            case PRICE_DESC -> menuRepository.findMenusByPriceDesc(storeId, cursor, pageable);
+            case DISCOUNT   -> menuRepository.findMenusByDiscountDesc(storeId, cursor, pageable);
         };
 
         boolean hasNext = sorted.size() > size;
@@ -63,11 +66,13 @@ public class MenuQueryServiceImpl implements MenuQueryService {
             cursor = null;
         }
 
-        final int limit = size + 1;
+        final int fetchSize = size + 1;
+        Pageable pageable = PageRequest.of(0, fetchSize);
+
         List<Menu> sorted = switch (sortType) {
-            case PRICE_ASC  -> menuRepository.findMenusByPriceAsc(null, cursor, limit);
-            case PRICE_DESC -> menuRepository.findMenusByPriceDesc(null, cursor, limit);
-            case DISCOUNT   -> menuRepository.findMenusByDiscountDesc(null, cursor, limit);
+            case PRICE_ASC  -> menuRepository.findMenusByPriceAsc(null, cursor, pageable);
+            case PRICE_DESC -> menuRepository.findMenusByPriceDesc(null, cursor, pageable);
+            case DISCOUNT   -> menuRepository.findMenusByDiscountDesc(null, cursor, pageable);
         };
 
         boolean hasNext = sorted.size() > size;

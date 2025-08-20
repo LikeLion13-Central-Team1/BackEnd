@@ -1,5 +1,6 @@
 package com.study.demo.backend.domain.menu.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import lombok.Builder;
@@ -67,10 +68,11 @@ public class MenuReqDTO {
                 Integer changedValue
         ) {}
 
+        @JsonIgnoreProperties(ignoreUnknown = true)
         @Schema(name = "AI 메뉴 설명 생성을 위한 요청 DTO")
         public record GenerateDescription(
                 @NotBlank(message = "메뉴 이름은 필수 입력값입니다.")
                 @Schema(description = "메뉴 이름", example = "포테이토 피자")
-                String menuName
+                String name
         ) {}
 }

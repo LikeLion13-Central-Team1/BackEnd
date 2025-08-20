@@ -42,7 +42,7 @@ public class GPTImgServiceImpl implements GPTImgService {
             String base64Image = encodeImageToBase64(menuImage);
             String contentType = menuImage.getContentType();
 
-            Map<String, Object> body = createBody(request.menuName(), base64Image, contentType);
+            Map<String, Object> body = createBody(request.name(), base64Image, contentType);
 
             return openaiWebClient.post()
                     .uri("/chat/completions")
