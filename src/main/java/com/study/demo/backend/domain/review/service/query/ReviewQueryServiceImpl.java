@@ -7,6 +7,11 @@ import com.study.demo.backend.domain.review.entity.Review;
 import com.study.demo.backend.domain.review.entity.enums.TargetType;
 import com.study.demo.backend.domain.review.repository.ReviewRepository;
 import com.study.demo.backend.domain.review.service.command.GPTService;
+import com.study.demo.backend.domain.user.entity.User;
+import com.study.demo.backend.domain.user.exception.UserErrorCode;
+import com.study.demo.backend.domain.user.exception.UserException;
+import com.study.demo.backend.domain.user.repository.UserRepository;
+import com.study.demo.backend.global.security.userdetails.AuthUser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
@@ -24,6 +29,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ReviewQueryServiceImpl implements ReviewQueryService {
 
+    private final UserRepository userRepository;
     private final ReviewRepository reviewRepository;
     private final GPTService gptService;
 
@@ -66,6 +72,34 @@ public class ReviewQueryServiceImpl implements ReviewQueryService {
         List<String> contents = reviews.stream().map(Review::getContent).toList();
         String summary = gptService.summarizeFromContents(contents);
         return new ReviewResDTO.Summary(summary);
+    }
+
+    @Override
+    public ReviewResDTO.ReviewDetailList getReviewsByUser(AuthUser authUser, Long cursor, int size) {
+        User user = userRepository.findById(authUser.getUserId())
+                .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
+
+        Pageable pageable = PageRequest.of(0, size + 1);
+        List<Review> reviews = reviewRepository.findReviewsByUserId(user.getId(), cursor, pageable);
+
+        boolean hasNext = reviews.size() > size;
+        if (hasNext) {
+            reviews = reviews.subList(0, size);
+        }
+
+        Long nextCursor = hasNext && !reviews.isEmpty()
+                ? reviews.get(reviews.size() - 1).getId()
+                : null;
+
+        List<ReviewResDTO.ReviewDetail> reviewDetails = reviews.stream()
+                .map(ReviewConverter::toReviewDetail)
+                .toList();
+
+        return ReviewResDTO.ReviewDetailList.builder()
+                .reviews(reviewDetails)
+                .hasNext(hasNext)
+                .cursor(nextCursor)
+                .build();
     }
 
     private List<Review> fetchReviewsByTargetType(
