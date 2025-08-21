@@ -1,6 +1,5 @@
 package com.study.demo.backend.domain.store.controller;
 
-import com.study.demo.backend.domain.store.converter.StoreConverter;
 import com.study.demo.backend.domain.store.dto.request.StoreReqDTO;
 import com.study.demo.backend.domain.store.dto.response.StoreResDTO;
 import com.study.demo.backend.domain.store.entity.Store;
@@ -37,18 +36,17 @@ public class StoreController {
 
     @PostMapping("")
     @Operation(summary = "가게 등록 API by 최현우", description = "사용자의 Role이 OWNER인 경우 가게를 등록합니다.")
-    public CustomResponse<StoreResDTO.Create> createStore(
-            @Valid @RequestBody StoreReqDTO.Create createDTO,
+    public CustomResponse<StoreResDTO.CreateStoreRes> createStore(
+            @Valid @RequestBody StoreReqDTO.CreateStoreReq createDTO,
             @CurrentUser AuthUser authUser
     ) {
 
         if (!authUser.getRole().equals(Role.OWNER)) {
             throw new CustomException(StoreErrorCode.STORE_ACCESS_DENIED);
         }
-        StoreResDTO.Create storeResDTO = storeCommandService.createStore(createDTO);
+        StoreResDTO.CreateStoreRes storeResDTO = storeCommandService.createStore(createDTO);
         return CustomResponse.onSuccess(storeResDTO);
     }
-
 
     @GetMapping("")
     @Operation(summary = "가게 목록 조회 API by 최현우", description = """
@@ -94,15 +92,15 @@ public class StoreController {
 
     @PatchMapping("/{storeId}")
     @Operation(summary = "가게 정보 수정 API by 최현우", description = "사용자의 Role이 OWNER인 경우 가게 정보를 수정합니다.")
-    public CustomResponse<StoreResDTO.Update> updateStore(
+    public CustomResponse<StoreResDTO.UpdateStoreRes> updateStore(
             @PathVariable Long storeId,
-            @Valid @RequestBody StoreReqDTO.Update updateDTO,
+            @Valid @RequestBody StoreReqDTO.UpdateStoreReq updateStoreReqDTO,
             @CurrentUser AuthUser authUser
     ) {
         if (!authUser.getRole().equals(Role.OWNER)) {
             throw new CustomException(StoreErrorCode.STORE_ACCESS_DENIED);
         }
-        StoreResDTO.Update response = storeCommandService.updateStore(storeId, updateDTO);
+        StoreResDTO.UpdateStoreRes response = storeCommandService.updateStore(storeId, updateStoreReqDTO);
         return CustomResponse.onSuccess(response);
     }
 }

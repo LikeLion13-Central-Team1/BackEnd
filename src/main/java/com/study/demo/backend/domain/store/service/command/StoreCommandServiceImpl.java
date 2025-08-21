@@ -24,7 +24,7 @@ public class StoreCommandServiceImpl implements StoreCommandService {
     private final StoreRepository storeRepository;
 
     @Override
-    public StoreResDTO.Create createStore(StoreReqDTO.@Valid Create create) {
+    public StoreResDTO.CreateStoreRes createStore(StoreReqDTO.@Valid CreateStoreReq create) {
         if (storeRepository.existsByName(create.name())) {
             throw new StoreException(StoreErrorCode.STORE_ALREADY_EXISTS);
         }
@@ -44,28 +44,28 @@ public class StoreCommandServiceImpl implements StoreCommandService {
     }
 
     @Override
-    public StoreResDTO.Update updateStore(Long storeId, StoreReqDTO.@Valid Update updateDTO) {
+    public StoreResDTO.UpdateStoreRes updateStore(Long storeId, StoreReqDTO.@Valid UpdateStoreReq updateStoreReqDTO) {
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new StoreException(StoreErrorCode.STORE_NOT_FOUND));
 
-        if (updateDTO.latitude() != null && (
-                updateDTO.latitude().compareTo(new BigDecimal("-90")) < 0 ||
-                        updateDTO.latitude().compareTo(new BigDecimal("90")) > 0)) {
+        if (updateStoreReqDTO.latitude() != null && (
+                updateStoreReqDTO.latitude().compareTo(new BigDecimal("-90")) < 0 ||
+                        updateStoreReqDTO.latitude().compareTo(new BigDecimal("90")) > 0)) {
             throw new StoreException(StoreErrorCode.INVALID_LOCATION);
         }
 
-        if (updateDTO.longitude() != null && (
-                updateDTO.longitude().compareTo(new BigDecimal("-180")) < 0 ||
-                        updateDTO.longitude().compareTo(new BigDecimal("180")) > 0)) {
+        if (updateStoreReqDTO.longitude() != null && (
+                updateStoreReqDTO.longitude().compareTo(new BigDecimal("-180")) < 0 ||
+                        updateStoreReqDTO.longitude().compareTo(new BigDecimal("180")) > 0)) {
             throw new StoreException(StoreErrorCode.INVALID_LOCATION);
         }
 
         store.update(
-                updateDTO.name(),
-                updateDTO.latitude(),
-                updateDTO.longitude(),
-                updateDTO.openingTime(),
-                updateDTO.closingTime()
+                updateStoreReqDTO.name(),
+                updateStoreReqDTO.latitude(),
+                updateStoreReqDTO.longitude(),
+                updateStoreReqDTO.openingTime(),
+                updateStoreReqDTO.closingTime()
         );
 
         return StoreConverter.toUpdateDTO(store);
