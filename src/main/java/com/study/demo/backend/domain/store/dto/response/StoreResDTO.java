@@ -11,7 +11,7 @@ import java.util.List;
 public class StoreResDTO {
 
     @Builder
-    public record Create(
+    public record CreateStoreReq(
             Long storeId,
             String name,
             LocalTime openingTime,
@@ -44,7 +44,7 @@ public class StoreResDTO {
     ) {}
 
     @Builder
-    public record Update(
+    public record UpdateStoreReq(
             Long storeId,
             String name,
             LocalTime openingTime,

@@ -11,7 +11,7 @@ import java.time.LocalTime;
 
 public class StoreReqDTO {
 
-    public record Create(
+    public record CreateStoreReq(
             @NotBlank(message = "가게 이름은 필수입니다.")
             @Schema(description = "가게 이름", example = "상명김밥")
             String name,
@@ -24,10 +24,12 @@ public class StoreReqDTO {
             @Schema(description = "경도 (longitude), 범위: -180 ~ 180", example = "126.9645")
             BigDecimal longitude,
 
+            @NotNull(message = "오픈시간은 필수입니다.")
             @Schema(description = "오픈 시간 (HH:mm:ss)", example = "08:00:00")
             @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm:ss")
             LocalTime openingTime,
 
+            @NotNull(message = "마감시간은 필수입니다.")
             @Schema(description = "마감 시간 (HH:mm:ss)", example = "20:00:00")
             @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm:ss")
             LocalTime closingTime
@@ -36,7 +38,7 @@ public class StoreReqDTO {
 
 
     @Builder
-    public record Update(
+    public record UpdateStoreReq(
             Long storeId,
 
             @Schema(description = "가게 이름", example = "가게 이름")

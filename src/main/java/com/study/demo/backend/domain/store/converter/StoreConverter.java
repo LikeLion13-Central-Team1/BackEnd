@@ -4,11 +4,9 @@ import com.study.demo.backend.domain.store.dto.request.StoreReqDTO;
 import com.study.demo.backend.domain.store.dto.response.StoreResDTO;
 import com.study.demo.backend.domain.store.entity.Store;
 
-import java.math.BigDecimal;
-
 public class StoreConverter {
 
-    public static Store toEntity(StoreReqDTO.Create dto) {
+    public static Store toEntity(StoreReqDTO.CreateStoreReq dto) {
         return Store.builder()
                 .name(dto.name())
                 .latitude(dto.latitude())
@@ -18,8 +16,8 @@ public class StoreConverter {
                 .build();
     }
 
-    public static StoreResDTO.Create toCreateDTO(Store store) {
-        return new StoreResDTO.Create(
+    public static StoreResDTO.CreateStoreReq toCreateDTO(Store store) {
+        return new StoreResDTO.CreateStoreReq(
                 store.getId(),
                 store.getName(),
                 store.getOpeningTime(),
@@ -50,8 +48,8 @@ public class StoreConverter {
     }
 
 
-    public static StoreResDTO.Update toUpdateDTO(Store store) {
-        return StoreResDTO.Update.builder()
+    public static StoreResDTO.UpdateStoreReq toUpdateDTO(Store store) {
+        return StoreResDTO.UpdateStoreReq.builder()
                 .storeId(store.getId())
                 .name(store.getName())
                 .openingTime(store.getOpeningTime())
