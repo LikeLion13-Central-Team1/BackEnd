@@ -16,8 +16,8 @@ public class StoreConverter {
                 .build();
     }
 
-    public static StoreResDTO.CreateStoreReq toCreateDTO(Store store) {
-        return new StoreResDTO.CreateStoreReq(
+    public static StoreResDTO.CreateStoreRes toCreateDTO(Store store) {
+        return new StoreResDTO.CreateStoreRes(
                 store.getId(),
                 store.getName(),
                 store.getOpeningTime(),
@@ -48,8 +48,8 @@ public class StoreConverter {
     }
 
 
-    public static StoreResDTO.UpdateStoreReq toUpdateDTO(Store store) {
-        return StoreResDTO.UpdateStoreReq.builder()
+    public static StoreResDTO.UpdateStoreRes toUpdateDTO(Store store) {
+        return StoreResDTO.UpdateStoreRes.builder()
                 .storeId(store.getId())
                 .name(store.getName())
                 .openingTime(store.getOpeningTime())

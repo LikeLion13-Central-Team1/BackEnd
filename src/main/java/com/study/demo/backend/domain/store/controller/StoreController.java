@@ -36,7 +36,7 @@ public class StoreController {
 
     @PostMapping("")
     @Operation(summary = "가게 등록 API by 최현우", description = "사용자의 Role이 OWNER인 경우 가게를 등록합니다.")
-    public CustomResponse<StoreResDTO.CreateStoreReq> createStore(
+    public CustomResponse<StoreResDTO.CreateStoreRes> createStore(
             @Valid @RequestBody StoreReqDTO.CreateStoreReq createDTO,
             @CurrentUser AuthUser authUser
     ) {
@@ -44,7 +44,7 @@ public class StoreController {
         if (!authUser.getRole().equals(Role.OWNER)) {
             throw new CustomException(StoreErrorCode.STORE_ACCESS_DENIED);
         }
-        StoreResDTO.CreateStoreReq storeResDTO = storeCommandService.createStore(createDTO);
+        StoreResDTO.CreateStoreRes storeResDTO = storeCommandService.createStore(createDTO);
         return CustomResponse.onSuccess(storeResDTO);
     }
 
@@ -92,7 +92,7 @@ public class StoreController {
 
     @PatchMapping("/{storeId}")
     @Operation(summary = "가게 정보 수정 API by 최현우", description = "사용자의 Role이 OWNER인 경우 가게 정보를 수정합니다.")
-    public CustomResponse<StoreResDTO.UpdateStoreReq> updateStore(
+    public CustomResponse<StoreResDTO.UpdateStoreRes> updateStore(
             @PathVariable Long storeId,
             @Valid @RequestBody StoreReqDTO.UpdateStoreReq updateStoreReqDTO,
             @CurrentUser AuthUser authUser
@@ -100,7 +100,7 @@ public class StoreController {
         if (!authUser.getRole().equals(Role.OWNER)) {
             throw new CustomException(StoreErrorCode.STORE_ACCESS_DENIED);
         }
-        StoreResDTO.UpdateStoreReq response = storeCommandService.updateStore(storeId, updateStoreReqDTO);
+        StoreResDTO.UpdateStoreRes response = storeCommandService.updateStore(storeId, updateStoreReqDTO);
         return CustomResponse.onSuccess(response);
     }
 }

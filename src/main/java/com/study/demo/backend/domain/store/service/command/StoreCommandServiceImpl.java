@@ -24,7 +24,7 @@ public class StoreCommandServiceImpl implements StoreCommandService {
     private final StoreRepository storeRepository;
 
     @Override
-    public StoreResDTO.CreateStoreReq createStore(StoreReqDTO.@Valid CreateStoreReq create) {
+    public StoreResDTO.CreateStoreRes createStore(StoreReqDTO.@Valid CreateStoreReq create) {
         if (storeRepository.existsByName(create.name())) {
             throw new StoreException(StoreErrorCode.STORE_ALREADY_EXISTS);
         }
@@ -44,7 +44,7 @@ public class StoreCommandServiceImpl implements StoreCommandService {
     }
 
     @Override
-    public StoreResDTO.UpdateStoreReq updateStore(Long storeId, StoreReqDTO.@Valid UpdateStoreReq updateStoreReqDTO) {
+    public StoreResDTO.UpdateStoreRes updateStore(Long storeId, StoreReqDTO.@Valid UpdateStoreReq updateStoreReqDTO) {
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new StoreException(StoreErrorCode.STORE_NOT_FOUND));
 

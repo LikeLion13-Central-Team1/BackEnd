@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public interface StoreCommandService {
-    StoreResDTO.CreateStoreReq createStore(StoreReqDTO.@Valid CreateStoreReq createDTO);
+    StoreResDTO.CreateStoreRes createStore(StoreReqDTO.@Valid CreateStoreReq createDTO);
 
-    StoreResDTO.UpdateStoreReq updateStore(Long storeId, StoreReqDTO.@Valid UpdateStoreReq updateStoreReqDTO);
+    StoreResDTO.UpdateStoreRes updateStore(Long storeId, StoreReqDTO.@Valid UpdateStoreReq updateStoreReqDTO);
 }
