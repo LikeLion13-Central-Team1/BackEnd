@@ -3,7 +3,12 @@ package com.study.demo.backend.domain.order.service.query;
 import com.study.demo.backend.domain.order.converter.OrderConverter;
 import com.study.demo.backend.domain.order.dto.response.OrderResDTO;
 import com.study.demo.backend.domain.order.entity.Order;
+import com.study.demo.backend.domain.order.exception.OrderErrorCode;
 import com.study.demo.backend.domain.order.repository.OrderRepository;
+import com.study.demo.backend.domain.store.repository.StoreRepository;
+import com.study.demo.backend.domain.user.entity.enums.Role;
+import com.study.demo.backend.global.apiPayload.exception.CustomException;
+import com.study.demo.backend.global.security.userdetails.AuthUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,23 +20,36 @@ import java.util.stream.Collectors;
 public class OrderQueryServiceImpl implements OrderQueryService {
 
     private final OrderRepository orderRepository;
+    private final StoreRepository storeRepository;
 
     @Override
-    public OrderResDTO.OrderList getUserOrders( Long cursor, int size) {
-        List<Order> orderList = orderRepository.findAllOrders(cursor, size);
+    public OrderResDTO.OrderList getUserOrders(Long cursor, int size, AuthUser authUser) {
+        final int limit = size + 1;
+        List<Order> orderList;
 
-        List<OrderResDTO.OrderDetail> orderDetailList = orderList.stream()
-                .map(OrderConverter::toOrderDetail)
-                .collect(Collectors.toList());
+        if (authUser.getRole() == Role.CUSTOMER) {
+            orderList = orderRepository.findByUserIdWithCursor(authUser.getUserId(), cursor, limit);
 
-        Long nextCursor = -1L;
-        if (!orderDetailList.isEmpty()) {
-            nextCursor = orderDetailList.get(orderDetailList.size() - 1).orderId();
-            if (orderDetailList.size() < size) {
-                nextCursor = -1L;
-            }
+        } else if (authUser.getRole() == Role.OWNER) {
+            Long storeId = storeRepository.findIdByUserId(authUser.getUserId())
+                    .orElseThrow(() -> new CustomException(OrderErrorCode.STORE_NOT_FOUND_FOR_OWNER));
+            orderList = orderRepository.findByStoreIdWithCursor(storeId, cursor, limit);
+
+        } else {
+            throw new CustomException(OrderErrorCode.ORDER_ACCESS_DENIED);
         }
 
-        return OrderConverter.toOrderList(orderDetailList, nextCursor);
+        boolean hasNext = orderList.size() > size;
+        if (hasNext) {
+            orderList = orderList.subList(0, size);
+        }
+
+        Long nextCursor = orderList.isEmpty() ? -1L : orderList.get(orderList.size() - 1).getId();
+        if (!hasNext) nextCursor = -1L;
+
+        return OrderConverter.toOrderList(
+                orderList.stream().map(OrderConverter::toOrderDetail).toList(),
+                nextCursor
+        );
     }
 }

@@ -17,4 +17,22 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             LIMIT :size
             """, nativeQuery = true)
     List<Order> findAllOrders(@Param("cursor") Long cursor, @Param("size") int size);
+
+    @Query(value = """
+                SELECT * FROM orders o
+                WHERE o.user_id = :userId
+                  AND (:cursor IS NULL OR o.id < :cursor)
+                ORDER BY o.id DESC
+                LIMIT :limit
+            """, nativeQuery = true)
+    List<Order> findByUserIdWithCursor(@Param("userId") Long userId, @Param("cursor") Long cursor, @Param("limit") int limit);
+
+    @Query(value = """
+                SELECT * FROM orders o
+                WHERE o.store_id = :storeId
+                  AND (:cursor IS NULL OR o.id < :cursor)
+                ORDER BY o.id DESC
+                LIMIT :limit
+            """, nativeQuery = true)
+    List<Order> findByStoreIdWithCursor(@Param("storeId") Long storeId, @Param("cursor") Long cursor, @Param("limit") int limit);
 }
