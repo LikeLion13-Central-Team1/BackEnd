@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 public enum OrderErrorCode implements BaseErrorCode {
     MENU_NOT_FOUND_IN_ORDER(HttpStatus.BAD_REQUEST, "ORDER400_0", "주문 요청에 존재하지 않는 메뉴가 포함되어 있습니다."),
     VISIT_TIME_ERROR(HttpStatus.BAD_REQUEST, "ORDER400_1", "픽업 시간은 현재 시간 이후로 설정해야 합니다."),
+    ORDER_TIME_UNAVAILABLE(HttpStatus.BAD_REQUEST, "ORDER400_2", "주문 시간은 마감 3시간 전부터 마감 시간 사이에만 가능합니다."),
 
     ORDER_ACCESS_DENIED(HttpStatus.FORBIDDEN, "ORDER403_0", "주문에 대한 접근 권한이 없습니다."),
 
