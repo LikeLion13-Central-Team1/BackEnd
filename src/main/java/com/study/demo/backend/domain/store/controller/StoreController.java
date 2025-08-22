@@ -1,5 +1,7 @@
 package com.study.demo.backend.domain.store.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.study.demo.backend.domain.store.dto.request.StoreReqDTO;
 import com.study.demo.backend.domain.store.dto.response.StoreResDTO;
 import com.study.demo.backend.domain.store.entity.Store;
@@ -17,10 +19,11 @@ import com.study.demo.backend.global.security.userdetails.AuthUser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
 @RestController
@@ -30,21 +33,26 @@ import org.springframework.web.bind.annotation.*;
 public class StoreController {
 
     private final StoreRepository storeRepository;
-
     private final StoreQueryService storeQueryService;
     private final StoreCommandService storeCommandService;
+    private final ObjectMapper objectMapper;
 
-    @PostMapping("")
+    @PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "가게 등록 API by 최현우", description = "사용자의 Role이 OWNER인 경우 가게를 등록합니다.")
     public CustomResponse<StoreResDTO.CreateStoreRes> createStore(
-            @Valid @RequestBody StoreReqDTO.CreateStoreReq createDTO,
+            @RequestPart("create") String createJson,
+            @RequestPart(value = "storeImage", required = false) MultipartFile storeImage,
             @CurrentUser AuthUser authUser
-    ) {
+    ) throws JsonProcessingException {
 
         if (!authUser.getRole().equals(Role.OWNER)) {
             throw new CustomException(StoreErrorCode.STORE_ACCESS_DENIED);
         }
-        StoreResDTO.CreateStoreRes storeResDTO = storeCommandService.createStore(createDTO);
+
+        StoreReqDTO.CreateStoreReq createDTO = objectMapper.readValue(createJson, StoreReqDTO.CreateStoreReq.class);
+
+        StoreResDTO.CreateStoreRes storeResDTO = storeCommandService.createStore(createDTO, storeImage, authUser);
+
         return CustomResponse.onSuccess(storeResDTO);
     }
 
@@ -90,17 +98,22 @@ public class StoreController {
         return CustomResponse.onSuccess(storeDetail);
     }
 
-    @PatchMapping("/{storeId}")
+    @PatchMapping(value = "/{storeId}",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "가게 정보 수정 API by 최현우", description = "사용자의 Role이 OWNER인 경우 가게 정보를 수정합니다.")
     public CustomResponse<StoreResDTO.UpdateStoreRes> updateStore(
             @PathVariable Long storeId,
-            @Valid @RequestBody StoreReqDTO.UpdateStoreReq updateStoreReqDTO,
+            @RequestPart("update") String updateJson,
+            @RequestPart(value = "storeImage", required = false) MultipartFile storeImage,
             @CurrentUser AuthUser authUser
-    ) {
+    ) throws JsonProcessingException {
         if (!authUser.getRole().equals(Role.OWNER)) {
             throw new CustomException(StoreErrorCode.STORE_ACCESS_DENIED);
         }
-        StoreResDTO.UpdateStoreRes response = storeCommandService.updateStore(storeId, updateStoreReqDTO);
+
+        StoreReqDTO.UpdateStoreReq updateDTO = objectMapper.readValue(updateJson, StoreReqDTO.UpdateStoreReq.class);
+
+        StoreResDTO.UpdateStoreRes response = storeCommandService.updateStore(storeId, updateDTO, storeImage, authUser);
+
         return CustomResponse.onSuccess(response);
     }
 }

@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface StoreRepository extends JpaRepository<Store, Long> {
 
@@ -58,4 +59,9 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
             @Param("cursor") Long cursor,
             @Param("size") int size
     );
+
+    @Query(value = "SELECT id FROM store WHERE user_id = :userId LIMIT 1", nativeQuery = true)
+    Optional<Long> findIdByUserId(@Param("userId") Long userId);
+
+    boolean existsByUser_Id(Long userId);
 }

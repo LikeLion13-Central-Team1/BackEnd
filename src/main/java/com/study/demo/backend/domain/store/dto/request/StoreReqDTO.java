@@ -35,8 +35,6 @@ public class StoreReqDTO {
             LocalTime closingTime
     ) { }
 
-
-
     @Builder
     public record UpdateStoreReq(
             Long storeId,

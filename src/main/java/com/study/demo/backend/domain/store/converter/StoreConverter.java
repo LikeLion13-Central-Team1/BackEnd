@@ -3,16 +3,19 @@ package com.study.demo.backend.domain.store.converter;
 import com.study.demo.backend.domain.store.dto.request.StoreReqDTO;
 import com.study.demo.backend.domain.store.dto.response.StoreResDTO;
 import com.study.demo.backend.domain.store.entity.Store;
+import com.study.demo.backend.domain.user.entity.User;
 
 public class StoreConverter {
 
-    public static Store toEntity(StoreReqDTO.CreateStoreReq dto) {
+    public static Store toEntity(StoreReqDTO.CreateStoreReq dto, String imageUrl, User owner) {
         return Store.builder()
+                .user(owner)
                 .name(dto.name())
                 .latitude(dto.latitude())
                 .longitude(dto.longitude())
                 .openingTime(dto.openingTime())
                 .closingTime(dto.closingTime())
+                .imageUrl(imageUrl)
                 .build();
     }
 
@@ -47,7 +50,6 @@ public class StoreConverter {
                 .build();
     }
 
-
     public static StoreResDTO.UpdateStoreRes toUpdateDTO(Store store) {
         return StoreResDTO.UpdateStoreRes.builder()
                 .storeId(store.getId())
@@ -57,6 +59,7 @@ public class StoreConverter {
                 .latitude(store.getLatitude())
                 .longitude(store.getLongitude())
                 .updatedAt(store.getUpdatedAt())
+                .imageUrl(store.getImageUrl())
                 .build();
     }
 }
