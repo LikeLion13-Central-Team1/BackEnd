@@ -8,5 +8,5 @@ import org.springframework.stereotype.Service;
 
 @Service
 public interface OrderQueryService {
-    OrderResDTO.OrderList getUserOrders(Long cursor, int size);
+    OrderResDTO.OrderList getUserOrders(Long cursor, int size, AuthUser authUser);
 }

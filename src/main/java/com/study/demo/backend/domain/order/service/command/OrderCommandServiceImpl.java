@@ -29,7 +29,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Map;
@@ -58,6 +60,17 @@ public class OrderCommandServiceImpl implements OrderCommandService {
 
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new CustomException(StoreErrorCode.STORE_NOT_FOUND));
+
+        // 마감 3시간 전 ~ 마감 시간까지 -> 주문 생성 가능 시간 확인
+        LocalTime closingTime = store.getClosingTime();
+        LocalDate today = LocalDate.now();
+        LocalDateTime todayClosingTime = LocalDateTime.of(today, closingTime);
+        LocalDateTime orderAvailableStartTime = todayClosingTime.minusHours(3);
+
+        LocalDateTime now = LocalDateTime.now(); // 또는 LocalDateTime.now(ZoneId.of("Asia/Seoul")) 등
+        if (now.isBefore(orderAvailableStartTime) || now.isAfter(todayClosingTime)) {
+            throw new CustomException(OrderErrorCode.ORDER_TIME_UNAVAILABLE);
+        }
 
         List<Long> menuIdList = createOrder.orderMenus().stream()
                 .map(OrderReqDTO.OrderItem::menuId)
@@ -136,6 +149,17 @@ public class OrderCommandServiceImpl implements OrderCommandService {
 
         if (!isSameStore) {
             throw new CustomException(OrderErrorCode.DIFFERENT_STORE_MENUS);
+        }
+
+        // 마감 3시간 전 ~ 마감 시간까지 -> 주문 생성 가능 시간 확인
+        LocalTime closingTime = store.getClosingTime();
+        LocalDate today = LocalDate.now();
+        LocalDateTime todayClosingTime = LocalDateTime.of(today, closingTime);
+        LocalDateTime orderAvailableStartTime = todayClosingTime.minusHours(3);
+
+        LocalDateTime now = LocalDateTime.now();
+        if (now.isBefore(orderAvailableStartTime) || now.isAfter(todayClosingTime)) {
+            throw new CustomException(OrderErrorCode.ORDER_TIME_UNAVAILABLE);
         }
 
         // 재고 확인 및 차감, OrderMenu 생성

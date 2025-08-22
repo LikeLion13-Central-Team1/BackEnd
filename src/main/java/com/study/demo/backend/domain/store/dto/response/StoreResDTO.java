@@ -2,7 +2,6 @@ package com.study.demo.backend.domain.store.dto.response;
 
 import lombok.Builder;
 
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -51,6 +50,7 @@ public class StoreResDTO {
             LocalTime closingTime,
             BigDecimal latitude,
             BigDecimal longitude,
-            LocalDateTime updatedAt
+            LocalDateTime updatedAt,
+            String imageUrl
     ) {}
 }

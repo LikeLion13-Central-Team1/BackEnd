@@ -1,6 +1,7 @@
 package com.study.demo.backend.domain.store.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.study.demo.backend.domain.user.entity.User;
 import com.study.demo.backend.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -19,6 +20,10 @@ public class Store extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false, unique = true)
+    private User user;
 
     @Column(name = "name", nullable = false)
     private String name;
@@ -43,12 +48,17 @@ public class Store extends BaseEntity {
     @Column(name = "closing_time", nullable = false)
     private LocalTime closingTime;
 
-    public void update(String name, BigDecimal latitude, BigDecimal longitude,
-                       LocalTime openingTime, LocalTime closingTime) {
+    public void update(
+            String name, BigDecimal latitude, BigDecimal longitude,
+            LocalTime openingTime, LocalTime closingTime, String imageUrl
+    ) {
         this.name = name;
         this.latitude = latitude;
         this.longitude = longitude;
         this.openingTime = openingTime;
         this.closingTime = closingTime;
+        if (imageUrl != null && !imageUrl.isBlank()) {
+            this.imageUrl = imageUrl;
+        }
     }
 }

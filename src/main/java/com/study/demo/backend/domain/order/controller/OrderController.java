@@ -60,6 +60,7 @@ public class OrderController {
     @GetMapping("/orders")
     @Operation(summary = "주문 목록 조회 API by 최현우", description = """
             주문 내역을 커서 기반 페이지네이션으로 조회합니다. CUSTOMER와 OWNER 모두 이 기능을 사용할 수 있도록 하였습니다.
+            CUSTOMER이면 본인이 주문 했던 목록을 조회 하도록하였고, OWNER이면 해당 가게에 주문된 목록을 조회하도록 하였습니다.
             - 정렬 기준 : 항상 최신순으로 정렬됩니다.
             - cursor : 마지막으로 조회한 orderId 
             - size : 한 번에 조회할 데이터 수 (기본 10개)""")
@@ -68,9 +69,11 @@ public class OrderController {
             @RequestParam(required = false) Long cursor,
 
             @Parameter(description = "한 번에 조회할 항목 수")
-            @RequestParam(defaultValue = "10") int size
+            @RequestParam(defaultValue = "10") int size,
+
+            @CurrentUser AuthUser authUser
     ) {
-        OrderResDTO.OrderList orderHistoryList = orderQueryService.getUserOrders( cursor, size);
+        OrderResDTO.OrderList orderHistoryList = orderQueryService.getUserOrders( cursor, size, authUser);
         return CustomResponse.onSuccess(orderHistoryList);
     }
 }
