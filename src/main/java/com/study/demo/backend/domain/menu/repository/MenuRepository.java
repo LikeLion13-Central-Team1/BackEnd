@@ -1,6 +1,7 @@
 package com.study.demo.backend.domain.menu.repository;
 
 import com.study.demo.backend.domain.menu.entity.Menu;
+import com.study.demo.backend.domain.store.entity.Store;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -56,4 +57,6 @@ public interface MenuRepository extends JpaRepository<Menu, Long> {
            AND m.quantity <> 0
     """)
     void zeroQuantitiesByStoreId(@Param("storeId") Long storeId);
+
+    List<Menu> findByStore(Store store);
 }
