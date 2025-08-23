@@ -1,5 +1,6 @@
 package com.study.demo.backend.domain.store.service.command;
 
+import com.study.demo.backend.domain.menu.repository.MenuRepository;
 import com.study.demo.backend.domain.store.converter.StoreConverter;
 import com.study.demo.backend.domain.store.dto.request.StoreReqDTO;
 import com.study.demo.backend.domain.store.dto.response.StoreResDTO;
@@ -22,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.time.LocalTime;
+import java.time.ZoneId;
 
 @Slf4j
 @Service
@@ -32,6 +34,9 @@ public class StoreCommandServiceImpl implements StoreCommandService {
     private final UserRepository userRepository;
     private final StoreRepository storeRepository;
     private final FileUploader fileUploader;
+    private final MenuRepository menuRepository;
+
+    private static final ZoneId ZONE = ZoneId.of("Asia/Seoul");
 
     @Override
     public StoreResDTO.CreateStoreRes createStore(StoreReqDTO.@Valid CreateStoreReq create, MultipartFile storeImage, AuthUser authUser) {
@@ -109,5 +114,39 @@ public class StoreCommandServiceImpl implements StoreCommandService {
         store.update(name, lat, lng, open, close, img);
 
         return StoreConverter.toUpdateDTO(store);
+    }
+
+    @Override
+    public StoreResDTO.CloseRes closeNow(Long storeId, Long ownerUserId) {
+        Store store = storeRepository.findById(storeId)
+                .orElseThrow(() -> new StoreException(StoreErrorCode.STORE_NOT_FOUND));
+
+        if (!store.getUser().getId().equals(ownerUserId)) {
+            throw new StoreException(StoreErrorCode.STORE_ACCESS_DENIED);
+        }
+
+        LocalTime now = LocalTime.now(ZONE);
+        LocalTime prev = store.getClosingTime();
+        store.updateClosingTime(now); // 마감 시간을 현 시간으로 바꿔서 가게의 상태를 마감으로 바꾸기
+
+        menuRepository.zeroQuantitiesByStoreId(storeId);
+
+        return StoreConverter.toCloseRes(store, prev, now);
+    }
+
+    @Override
+    public StoreResDTO.OpenRes openNow(Long storeId, Long ownerUserId) {
+        Store store = storeRepository.findById(storeId)
+                .orElseThrow(() -> new StoreException(StoreErrorCode.STORE_NOT_FOUND));
+
+        if (!store.getUser().getId().equals(ownerUserId)) {
+            throw new StoreException(StoreErrorCode.STORE_ACCESS_DENIED);
+        }
+
+        LocalTime now = LocalTime.now(ZONE);
+        LocalTime prev = store.getOpeningTime();
+        store.updateOpeningTime(now); // 오픈 시간을 현 시간으로 하여 가게의 상태를 오픈의 상태처럼 유지하기
+
+        return StoreConverter.toOpenRes(store, prev, now);
     }
 }

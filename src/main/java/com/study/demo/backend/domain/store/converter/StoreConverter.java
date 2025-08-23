@@ -5,6 +5,8 @@ import com.study.demo.backend.domain.store.dto.response.StoreResDTO;
 import com.study.demo.backend.domain.store.entity.Store;
 import com.study.demo.backend.domain.user.entity.User;
 
+import java.time.LocalTime;
+
 public class StoreConverter {
 
     public static Store toEntity(StoreReqDTO.CreateStoreReq dto, String imageUrl, User owner) {
@@ -60,6 +62,22 @@ public class StoreConverter {
                 .longitude(store.getLongitude())
                 .updatedAt(store.getUpdatedAt())
                 .imageUrl(store.getImageUrl())
+                .build();
+    }
+
+    public static StoreResDTO.CloseRes toCloseRes(Store store,LocalTime previousClosingTime,LocalTime newClosingTime) {
+        return StoreResDTO.CloseRes.builder()
+                .storeId(store.getId())
+                .previousClosingTime(previousClosingTime)
+                .newClosingTime(newClosingTime)
+                .build();
+    }
+
+    public static StoreResDTO.OpenRes toOpenRes(Store store,LocalTime previousOpeningTime,LocalTime newOpeningTime) {
+        return StoreResDTO.OpenRes.builder()
+                .storeId(store.getId())
+                .previousOpeningTime(previousOpeningTime)
+                .newOpeningTime(newOpeningTime)
                 .build();
     }
 }

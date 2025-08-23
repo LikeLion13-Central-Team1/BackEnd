@@ -61,4 +61,7 @@ public class Store extends BaseEntity {
             this.imageUrl = imageUrl;
         }
     }
+
+    public void updateOpeningTime(LocalTime now) { this.openingTime = now; }
+    public void updateClosingTime(LocalTime now) { this.closingTime = now; }
 }
