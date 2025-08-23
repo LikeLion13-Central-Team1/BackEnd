@@ -83,6 +83,7 @@ public class OrderConverter {
                 .storeName(order.getStore().getName())
                 .totalPrice(order.getTotalPrice())
                 .orderTime(order.getOrderTime())
+                .visitTime(order.getVisitTime())
                 .menuSummaries(menuAndQuantity)
                 .build();
     }

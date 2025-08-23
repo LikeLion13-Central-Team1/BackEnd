@@ -67,7 +67,7 @@ public class OrderCommandServiceImpl implements OrderCommandService {
         LocalDateTime todayClosingTime = LocalDateTime.of(today, closingTime);
         LocalDateTime orderAvailableStartTime = todayClosingTime.minusHours(3);
 
-        LocalDateTime now = LocalDateTime.now(); // 또는 LocalDateTime.now(ZoneId.of("Asia/Seoul")) 등
+        LocalDateTime now = LocalDateTime.now();
         if (now.isBefore(orderAvailableStartTime) || now.isAfter(todayClosingTime)) {
             throw new CustomException(OrderErrorCode.ORDER_TIME_UNAVAILABLE);
         }
