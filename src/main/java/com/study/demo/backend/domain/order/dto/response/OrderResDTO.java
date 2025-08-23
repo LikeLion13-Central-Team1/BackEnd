@@ -48,6 +48,9 @@ public class OrderResDTO {
             @Schema(description = "주문 생성 시각")
             LocalDateTime orderTime,
 
+            @Schema(description = "방문 시각")
+            LocalDateTime visitTime,
+
             @Schema(description = "주문한 메뉴 목록 ")
             List<String> menuSummaries
     ) {}
