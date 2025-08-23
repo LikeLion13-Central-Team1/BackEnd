@@ -52,7 +52,16 @@ public class OrderResDTO {
             LocalDateTime visitTime,
 
             @Schema(description = "주문한 메뉴 목록 ")
-            List<String> menuSummaries
+            List<String> menuSummaries,
+
+            @Schema(description = "총 정가", example = "30000")
+            BigDecimal totalOriginalPrice,
+
+            @Schema(description = "총 할인 금액", example = "4000")
+            BigDecimal totalDiscountAmount,
+
+            @Schema(description = "평균 할인율(%)", example = "13.33")
+            BigDecimal averageDiscountPercent
     ) {}
 
     @Builder

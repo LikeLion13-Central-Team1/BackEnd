@@ -9,6 +9,7 @@ import com.study.demo.backend.domain.store.entity.Store;
 import com.study.demo.backend.domain.user.entity.User;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -77,11 +78,27 @@ public class OrderConverter {
                 .map(orderMenu -> orderMenu.getMenu().getName() + " X " + orderMenu.getQuantity())
                 .collect(Collectors.toList());
 
+        // 할인 정보 계산
+        BigDecimal totalOriginalPrice = order.getOrderMenus().stream()
+                .map(orderMenu -> orderMenu.getMenu().getPrice()
+                        .multiply(BigDecimal.valueOf(orderMenu.getQuantity())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal totalDiscountAmount = totalOriginalPrice.subtract(order.getTotalPrice());
+
+        BigDecimal averageDiscountPercent = totalOriginalPrice.compareTo(BigDecimal.ZERO) > 0
+                ? totalDiscountAmount.multiply(BigDecimal.valueOf(100))
+                .divide(totalOriginalPrice, 2, RoundingMode.HALF_UP)
+                : BigDecimal.ZERO;
+
         return OrderResDTO.OrderDetail.builder()
                 .orderId(order.getId())
                 .orderNum(order.getOrderNum())
                 .storeName(order.getStore().getName())
                 .totalPrice(order.getTotalPrice())
+                .totalOriginalPrice(totalOriginalPrice)
+                .totalDiscountAmount(totalDiscountAmount)
+                .averageDiscountPercent(averageDiscountPercent)
                 .orderTime(order.getOrderTime())
                 .visitTime(order.getVisitTime())
                 .menuSummaries(menuAndQuantity)
