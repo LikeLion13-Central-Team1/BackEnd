@@ -25,6 +25,9 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/store")
@@ -58,11 +61,11 @@ public class StoreController {
 
     @GetMapping("")
     @Operation(summary = "가게 목록 조회 API by 최현우", description = """
-        가게 목록을 커서 기반 페이지네이션으로 조회합니다.  
-        - 정렬 기준 : 'distance(거리순)', 'review(리뷰 많은 순)'
-        - cursor : 마지막으로 조회한 storeId (기본 null)
-        - size : 조회할 데이터 수 (기본 10개)
-        - 'lat', 'lng' : 현재 위치 좌표 (기본 상명대 위치) """)
+            가게 목록을 커서 기반 페이지네이션으로 조회합니다.  
+            - 정렬 기준 : 'distance(거리순)', 'review(리뷰 많은 순)'
+            - cursor : 마지막으로 조회한 storeId (기본 null)
+            - size : 조회할 데이터 수 (기본 10개)
+            - 'lat', 'lng' : 현재 위치 좌표 (기본 상명대 위치) """)
     public CustomResponse<StoreResDTO.StoreDetailList> getStoreList(
             @Parameter(description = "마지막으로 조회한 storeId")
             @RequestParam(required = false) Long cursor,
@@ -98,7 +101,7 @@ public class StoreController {
         return CustomResponse.onSuccess(storeDetail);
     }
 
-    @PatchMapping(value = "/{storeId}",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PatchMapping(value = "/{storeId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "가게 정보 수정 API by 최현우", description = "사용자의 Role이 OWNER인 경우 가게 정보를 수정합니다.")
     public CustomResponse<StoreResDTO.UpdateStoreRes> updateStore(
             @PathVariable Long storeId,
@@ -116,5 +119,42 @@ public class StoreController {
 
         return CustomResponse.onSuccess(response);
     }
-}
 
+    @PostMapping("/{storeId}/close")
+    @Operation(
+            summary = "가게 즉시 마감",
+            description = "closing_time을 현재 시각으로 변경하고, 모든 메뉴 재고를 0으로 만듭니다."
+    )
+    public CustomResponse<StoreResDTO.CloseRes> closeNow(
+            @PathVariable Long storeId,
+            @CurrentUser AuthUser authUser
+    ) {
+        if (!authUser.getRole().equals(Role.OWNER)) {
+            throw new CustomException(StoreErrorCode.STORE_ACCESS_DENIED);
+        }
+        StoreResDTO.CloseRes closeRes = storeCommandService.closeNow(storeId, authUser.getUserId());
+
+        return CustomResponse.onSuccess(
+                closeRes,
+                "마감 시간을 " + closeRes.newClosingTime().format(DateTimeFormatter.ofPattern("HH:mm:ss")) + "로 설정하여 가게가 마감되었습니다." +
+                        "오늘 영업 후에는 가게 정보 수정에서 마감 시간을 수정해야합니다.");
+
+    }
+
+    @PostMapping("/{storeId}/open")
+    @Operation(summary = "가게 즉시 오픈", description = "opening_time을 현재 시각으로 변경합니다.")
+    public CustomResponse<StoreResDTO.OpenRes> openNow(
+            @PathVariable Long storeId,
+            @CurrentUser AuthUser authUser
+    ) {
+        if (!authUser.getRole().equals(Role.OWNER)) {
+            throw new CustomException(StoreErrorCode.STORE_ACCESS_DENIED);
+        }
+        StoreResDTO.OpenRes openRes = storeCommandService.openNow(storeId, authUser.getUserId());
+
+        return CustomResponse.onSuccess(
+                openRes,
+                "오픈 시간을 " + openRes.newOpeningTime().format(DateTimeFormatter.ofPattern("HH:mm:ss")) + "로 설정하여 가게가 오픈되었습니다." +
+                        "오늘 영업 후에는 가게 정보 수정에서 오픈 시간을 수정해야합니다.");
+    }
+}

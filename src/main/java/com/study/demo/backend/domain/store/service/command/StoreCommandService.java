@@ -12,4 +12,8 @@ public interface StoreCommandService {
     StoreResDTO.CreateStoreRes createStore(StoreReqDTO.@Valid CreateStoreReq createDTO, MultipartFile storeImage, AuthUser authUser);
 
     StoreResDTO.UpdateStoreRes updateStore(Long storeId, StoreReqDTO.@Valid UpdateStoreReq updateStoreReqDTO, MultipartFile storeImage, AuthUser authUser);
+
+    StoreResDTO.CloseRes closeNow(Long storeId, Long userId);
+
+    StoreResDTO.OpenRes openNow(Long storeId, Long userId);
 }

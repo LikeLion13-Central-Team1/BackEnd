@@ -53,4 +53,18 @@ public class StoreResDTO {
             LocalDateTime updatedAt,
             String imageUrl
     ) {}
+
+    @Builder
+    public record CloseRes(
+            Long storeId,
+            LocalTime previousClosingTime,
+            LocalTime newClosingTime
+    ) {}
+
+    @Builder
+    public record OpenRes(
+            Long storeId,
+            LocalTime previousOpeningTime,
+            LocalTime newOpeningTime
+    ) {}
 }
