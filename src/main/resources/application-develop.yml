@@ -32,6 +32,7 @@ file:
   upload:
     root: ./uploads
     public-prefix: /uploads
+    domain: ${FILE_UPLOAD_DOMAIN:https://api-whynotbuy.store}
 
 webclient:
   connection-timeout: 5000
