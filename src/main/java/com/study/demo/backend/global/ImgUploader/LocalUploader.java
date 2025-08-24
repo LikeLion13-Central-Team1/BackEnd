@@ -1,12 +1,10 @@
 package com.study.demo.backend.global.ImgUploader;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.beans.factory.annotation.Value;
 
-import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -23,6 +21,9 @@ public class LocalUploader implements FileUploader {
 
     @Value("${file.upload.public-prefix:/uploads}")
     private String publicPrefix;
+
+    @Value("${file.upload.domain}")
+    private String domain;
 
     @Override
     public String upload(MultipartFile file, String dir) {
@@ -47,7 +48,9 @@ public class LocalUploader implements FileUploader {
                 Files.copy(in, target, StandardCopyOption.REPLACE_EXISTING);
             }
 
-            return publicPrefix + "/" + dir + "/" + savedName;
+            String base = domain.endsWith("/") ? domain.substring(0, domain.length() - 1) : domain;
+            String prefix = publicPrefix.startsWith("/") ? publicPrefix : "/" + publicPrefix;
+            return base + prefix + "/" + dir + "/" + savedName;
 
         } catch (Exception e) {
             log.error("Local upload failed: root={}, dir={}, size={}, contentType={}, reason={}",
