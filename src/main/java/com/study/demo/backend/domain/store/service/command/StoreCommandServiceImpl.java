@@ -117,6 +117,7 @@ public class StoreCommandServiceImpl implements StoreCommandService {
     }
 
     @Override
+    @Transactional
     public StoreResDTO.CloseRes closeNow(Long storeId, Long ownerUserId) {
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new StoreException(StoreErrorCode.STORE_NOT_FOUND));
@@ -124,6 +125,13 @@ public class StoreCommandServiceImpl implements StoreCommandService {
         if (!store.getUser().getId().equals(ownerUserId)) {
             throw new StoreException(StoreErrorCode.STORE_ACCESS_DENIED);
         }
+
+        // 이미 false이면 이미 false라고 반환하기
+        if (!store.isOpenStatus()) {
+            throw new StoreException(StoreErrorCode.STORE_STATUS_DENIED);
+        }
+
+        store.updateStatus(false); // 가게 상태 변경
 
         LocalTime now = LocalTime.now(ZONE);
         LocalTime prev = store.getClosingTime();
@@ -135,6 +143,7 @@ public class StoreCommandServiceImpl implements StoreCommandService {
     }
 
     @Override
+    @Transactional
     public StoreResDTO.OpenRes openNow(Long storeId, Long ownerUserId) {
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new StoreException(StoreErrorCode.STORE_NOT_FOUND));
@@ -142,6 +151,13 @@ public class StoreCommandServiceImpl implements StoreCommandService {
         if (!store.getUser().getId().equals(ownerUserId)) {
             throw new StoreException(StoreErrorCode.STORE_ACCESS_DENIED);
         }
+
+        // 이미 opne이면 이미 open라고 반환하기
+        if (store.isOpenStatus()) {
+            throw new StoreException(StoreErrorCode.STORE_STATUS_DENIED);
+        }
+
+        store.updateStatus(true);
 
         LocalTime now = LocalTime.now(ZONE);
         LocalTime prev = store.getOpeningTime();

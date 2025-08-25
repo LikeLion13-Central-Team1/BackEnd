@@ -138,7 +138,6 @@ public class StoreController {
                 closeRes,
                 "마감 시간을 " + closeRes.newClosingTime().format(DateTimeFormatter.ofPattern("HH:mm:ss")) + "로 설정하여 가게가 마감되었습니다." +
                         "오늘 영업 후에는 가게 정보 수정에서 마감 시간을 수정해야합니다.");
-
     }
 
     @PostMapping("/{storeId}/open")

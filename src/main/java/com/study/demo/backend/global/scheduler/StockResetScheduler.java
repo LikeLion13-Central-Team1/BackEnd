@@ -4,6 +4,7 @@ import com.study.demo.backend.domain.menu.entity.Menu;
 import com.study.demo.backend.domain.menu.repository.MenuRepository;
 import com.study.demo.backend.domain.store.entity.Store;
 import com.study.demo.backend.domain.store.repository.StoreRepository;
+import org.hibernate.engine.jdbc.env.internal.LobCreationLogging;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,4 +50,23 @@ public class StockResetScheduler {
 
         log.info("재고 리셋 스케줄러 종료");
     }
+
+    @Scheduled(cron = "0 */5 * * * *") // 5분 간격으로
+    @Transactional
+    public void updateOpenStatus() {
+        LocalTime now = LocalTime.now();
+        log.info("가게 오픈 상태 확인 스케줄러 실행: {}", now);
+
+        List<Store> allStores = storeRepository.findAll();
+        for (Store store : allStores) {
+            boolean before = store.isOpenStatus();
+            store.updateOpenStatus();
+
+            if (before != store.isOpenStatus()) {
+                log.info("가게 상태 변경: {} -> {}", store.getName(), store.isOpenStatus() ? "OPEN" : "CLOSED");
+            }
+        }
+        log.info("가게 오픈 상태 확인 스케줄러 종료");
+    }
+
 }
