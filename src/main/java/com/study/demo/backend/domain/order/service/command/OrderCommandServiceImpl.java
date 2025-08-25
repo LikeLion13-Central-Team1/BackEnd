@@ -62,7 +62,15 @@ public class OrderCommandServiceImpl implements OrderCommandService {
                 .orElseThrow(() -> new CustomException(StoreErrorCode.STORE_NOT_FOUND));
 
         // 마감 10시간 전 ~ 마감 시간까지 -> 주문 생성 가능 시간 확인
-        LocalTime closing경
+        LocalTime closingTime = store.getClosingTime();
+        LocalDate today = LocalDate.now();
+        LocalDateTime todayClosingTime = LocalDateTime.of(today, closingTime);
+        LocalDateTime orderAvailableStartTime = todayClosingTime.minusHours(10);
+
+        LocalDateTime now = LocalDateTime.now();
+//        if (now.isBefore(orderAvailableStartTime) || now.isAfter(todayClosingTime)) {
+//            throw new CustomException(OrderErrorCode.ORDER_TIME_UNAVAILABLE);
+//        } 주문 생성 제한 없애기!
 
         List<Long> menuIdList = createOrder.orderMenus().stream()
                 .map(OrderReqDTO.OrderItem::menuId)
