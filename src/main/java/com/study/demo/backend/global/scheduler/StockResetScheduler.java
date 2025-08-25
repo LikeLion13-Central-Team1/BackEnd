@@ -51,7 +51,7 @@ public class StockResetScheduler {
         log.info("재고 리셋 스케줄러 종료");
     }
 
-    @Scheduled(cron = "0 */5 * * * *") // 5분 간격으로
+    @Scheduled(cron = "0 */3 * * * *") // 3분 간격으로
     @Transactional
     public void updateOpenStatus() {
         LocalTime now = LocalTime.now();
