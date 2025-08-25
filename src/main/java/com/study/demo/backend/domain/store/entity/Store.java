@@ -48,6 +48,9 @@ public class Store extends BaseEntity {
     @Column(name = "closing_time", nullable = false)
     private LocalTime closingTime;
 
+    @Column(name = "open_status", nullable = false)
+    private boolean openStatus;
+
     public void update(
             String name, BigDecimal latitude, BigDecimal longitude,
             LocalTime openingTime, LocalTime closingTime, String imageUrl
@@ -64,4 +67,27 @@ public class Store extends BaseEntity {
 
     public void updateOpeningTime(LocalTime now) { this.openingTime = now; }
     public void updateClosingTime(LocalTime now) { this.closingTime = now; }
+    public void updateStatus(boolean isOpenStatus) { this.openStatus = isOpenStatus; }
+
+    public void syncOpenStatus(LocalTime now) {
+        if (openingTime.equals(closingTime)) {
+            this.openStatus = false;
+            return;
+        }
+
+        boolean wrapsMidnight = openingTime.isAfter(closingTime);
+        boolean isOpen;
+
+        if (!wrapsMidnight) {
+            isOpen = !now.isBefore(openingTime) && !now.isAfter(closingTime);
+        } else {
+            isOpen = !now.isBefore(openingTime) || !now.isAfter(closingTime);
+        }
+        this.openStatus = isOpen;
+    }
+
+    public void updateOpenStatus() {
+        syncOpenStatus(LocalTime.now());
+    }
 }
+

@@ -49,6 +49,7 @@ public class StoreConverter {
                 .longitude(store.getLongitude())
                 .createdAt(store.getCreatedAt())
                 .favorited(favorited)
+                .openStatus(store.isOpenStatus())
                 .build();
     }
 
@@ -62,6 +63,7 @@ public class StoreConverter {
                 .longitude(store.getLongitude())
                 .updatedAt(store.getUpdatedAt())
                 .imageUrl(store.getImageUrl())
+                .openStatus(store.isOpenStatus())
                 .build();
     }
 
@@ -70,6 +72,7 @@ public class StoreConverter {
                 .storeId(store.getId())
                 .previousClosingTime(previousClosingTime)
                 .newClosingTime(newClosingTime)
+                .openStatus(store.isOpenStatus())
                 .build();
     }
 
@@ -78,6 +81,7 @@ public class StoreConverter {
                 .storeId(store.getId())
                 .previousOpeningTime(previousOpeningTime)
                 .newOpeningTime(newOpeningTime)
+                .openStatus(store.isOpenStatus())
                 .build();
     }
 }
