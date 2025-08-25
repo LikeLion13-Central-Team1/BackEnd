@@ -1,5 +1,6 @@
 package com.study.demo.backend.domain.store.dto.response;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 
 import java.math.BigDecimal;
@@ -70,5 +71,18 @@ public class StoreResDTO {
             LocalTime previousOpeningTime,
             LocalTime newOpeningTime,
             boolean openStatus
+    ) {}
+
+    @Builder
+    @Schema(name = "가게 존재 여부 응답 DTO")
+    public record StoreExists(
+            @Schema(description = "가게 존재 여부", example = "true")
+            boolean exists,
+
+            @Schema(description = "가게 ID (존재하는 경우)", example = "1")
+            Long storeId,
+
+            @Schema(description = "가게 이름 (존재하는 경우)", example = "김밥천국")
+            String storeName
     ) {}
 }

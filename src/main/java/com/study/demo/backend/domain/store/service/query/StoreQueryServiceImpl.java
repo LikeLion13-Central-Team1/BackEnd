@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @RequiredArgsConstructor
@@ -68,5 +69,28 @@ public class StoreQueryServiceImpl implements StoreQueryService {
         if (page.isEmpty()) return Set.of();
         List<Long> storeIds = page.stream().map(Store::getId).toList();
         return new HashSet<>(favoriteStoreRepository.findFavoriteStoreIds(userId, storeIds));
+    }
+
+    @Override
+    public StoreResDTO.StoreExists checkStoreExists(Long userId) {
+        Optional<Long> storeIdOptional = storeRepository.findIdByUserId(userId);
+
+        if (storeIdOptional.isPresent()) {
+            Long storeId = storeIdOptional.get();
+            Store store = storeRepository.findById(storeId)
+                    .orElseThrow(() -> new StoreException(StoreErrorCode.STORE_NOT_FOUND));
+
+            return StoreResDTO.StoreExists.builder()
+                    .exists(true)
+                    .storeId(store.getId())
+                    .storeName(store.getName())
+                    .build();
+        } else {
+            return StoreResDTO.StoreExists.builder()
+                    .exists(false)
+                    .storeId(null)
+                    .storeName(null)
+                    .build();
+        }
     }
 }

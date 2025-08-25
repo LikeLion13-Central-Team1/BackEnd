@@ -8,4 +8,5 @@ import org.springframework.stereotype.Service;
 public interface StoreQueryService {
     StoreResDTO.StoreDetailList getStoreList(Long cursor, int size, StoreSortType type, double lat, double lng, Long userId);
     StoreResDTO.StoreDetail getStoreDetail(Long storeId, Long userId);
+    StoreResDTO.StoreExists checkStoreExists(Long userId);
 }

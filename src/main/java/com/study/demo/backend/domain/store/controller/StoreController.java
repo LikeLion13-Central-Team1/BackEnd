@@ -120,6 +120,17 @@ public class StoreController {
         return CustomResponse.onSuccess(response);
     }
 
+    @GetMapping("/exists")
+    @Operation(summary = "사장님 가게 존재 여부 확인 API by AI", description = "현재 로그인한 사장님 유저가 등록한 가게가 존재하는지 확인합니다.")
+    public CustomResponse<StoreResDTO.StoreExists> checkStoreExists(@CurrentUser AuthUser authUser) {
+        if (!authUser.getRole().equals(Role.OWNER)) {
+            throw new CustomException(StoreErrorCode.STORE_ACCESS_DENIED);
+        }
+
+        StoreResDTO.StoreExists response = storeQueryService.checkStoreExists(authUser.getUserId());
+        return CustomResponse.onSuccess(response);
+    }
+
     @PostMapping("/{storeId}/close")
     @Operation(
             summary = "가게 즉시 마감",
