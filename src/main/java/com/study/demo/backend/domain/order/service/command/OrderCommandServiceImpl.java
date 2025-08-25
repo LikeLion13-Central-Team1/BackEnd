@@ -61,11 +61,11 @@ public class OrderCommandServiceImpl implements OrderCommandService {
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new CustomException(StoreErrorCode.STORE_NOT_FOUND));
 
-        // 마감 3시간 전 ~ 마감 시간까지 -> 주문 생성 가능 시간 확인
+        // 마감 10시간 전 ~ 마감 시간까지 -> 주문 생성 가능 시간 확인
         LocalTime closingTime = store.getClosingTime();
         LocalDate today = LocalDate.now();
         LocalDateTime todayClosingTime = LocalDateTime.of(today, closingTime);
-        LocalDateTime orderAvailableStartTime = todayClosingTime.minusHours(3);
+        LocalDateTime orderAvailableStartTime = todayClosingTime.minusHours(10);
 
         LocalDateTime now = LocalDateTime.now();
         if (now.isBefore(orderAvailableStartTime) || now.isAfter(todayClosingTime)) {
