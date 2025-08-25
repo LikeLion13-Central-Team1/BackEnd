@@ -158,9 +158,9 @@ public class OrderCommandServiceImpl implements OrderCommandService {
         LocalDateTime orderAvailableStartTime = todayClosingTime.minusHours(3);
 
         LocalDateTime now = LocalDateTime.now();
-        if (now.isBefore(orderAvailableStartTime) || now.isAfter(todayClosingTime)) {
-            throw new CustomException(OrderErrorCode.ORDER_TIME_UNAVAILABLE);
-        }
+//        if (now.isBefore(orderAvailableStartTime) || now.isAfter(todayClosingTime)) {
+//            throw new CustomException(OrderErrorCode.ORDER_TIME_UNAVAILABLE);
+//        }
 
         // 재고 확인 및 차감, OrderMenu 생성
         List<OrderMenu> orderMenus = cartMenus.stream().map(cartMenu -> {
