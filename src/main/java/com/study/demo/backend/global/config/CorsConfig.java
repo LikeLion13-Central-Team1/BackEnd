@@ -32,6 +32,7 @@ public class CorsConfig {
         allowedOriginPatterns.add("https://api-whynotbuy.store");
         allowedOriginPatterns.add("https://www.api-whynotbuy.store");
         allowedOriginPatterns.add("https://front-end-eight.vercel.app");
+        allowedOriginPatterns.add("https://front1-end-eight.vercel.app");
 
         configuration.setAllowedOriginPatterns(allowedOriginPatterns); // 허용할 Origin 설정
 
